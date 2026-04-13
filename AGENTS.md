@@ -5,6 +5,7 @@
 
 ## 快速开始
 - 构建： `./gradlew assembleDebug`
+- 测试： `./gradlew test`
 
 ## 硬性规则（必须遵守，CI 会验证）
 
