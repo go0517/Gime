@@ -130,9 +130,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: Kime ${{ steps.get_version.outputs.VERSION }}
+          name: Xime ${{ steps.get_version.outputs.VERSION }}
           body: |
-            ## Kime ${{ steps.get_version.outputs.VERSION }}
+            ## Xime ${{ steps.get_version.outputs.VERSION }}
             
             ### 主程序下载
             选择对应架构的APK：

@@ -1,18 +1,18 @@
-# Kime Release Installation Script
+# Xime Release Installation Script
 param(
     [string]$Action = "all",
     [string]$Source = "ide"
 )
 
-$PackageName = "com.kingzcheung.kime"
+$PackageName = "com.kingzcheung.xime"
 $Plugins = @(
-    "com.kingzcheung.kime.plugin.emoji",
-    "com.kingzcheung.kime.plugin.kaomoji"
+    "com.kingzcheung.xime.plugin.emoji",
+    "com.kingzcheung.xime.plugin.kaomoji"
 )
 
 Write-Host ""
 Write-Host "================================"
-Write-Host "  Kime Release Install Script"
+Write-Host "  Xime Release Install Script"
 Write-Host "================================"
 Write-Host ""
 Write-Host "Actions: all | app | plugins | uninstall"

@@ -20,11 +20,11 @@
 -keep class kotlinx.coroutines.** { *; }
 -keepclassmembers class kotlinx.coroutines.** { *; }
 
--keep class com.kingzcheung.kime.plugin.** { *; }
--keepclassmembers class com.kingzcheung.kime.plugin.** { *; }
+-keep class com.kingzcheung.xime.plugin.** { *; }
+-keepclassmembers class com.kingzcheung.xime.plugin.** { *; }
 
--keep class com.kingzcheung.kime.rime.** { *; }
--keep class com.kingzcheung.kime.**Jni** { *; }
+-keep class com.kingzcheung.xime.rime.** { *; }
+-keep class com.kingzcheung.xime.**Jni** { *; }
 
 -keepattributes SourceFile,LineNumberTable
 

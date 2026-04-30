@@ -1,4 +1,4 @@
-# Kime 五笔输入法
+# Xime 五笔输入法
 
 ## 项目简介
 这是一个基于 rime 框架实现的安卓手机五笔输入法，采用 kotlin + jetpack compose 构建。

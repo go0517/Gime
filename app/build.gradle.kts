@@ -176,10 +176,10 @@ tasks.register("clearPlugins", DefaultTask::class) {
     description = "Clear all plugin data from device (requires connected device with adb)"
     
     doLast {
-        val packageName = "com.kingzcheung.kime"
+        val packageName = "com.kingzcheung.xime"
         val pluginsDir = "/data/data/$packageName/files/plugins"
         
-        println("=== Clearing Kime plugin data ===")
+        println("=== Clearing Xime plugin data ===")
         
         val devicesCheck = executeCommand("adb devices")
         if (!devicesCheck.contains("device")) {
@@ -193,19 +193,19 @@ tasks.register("clearPlugins", DefaultTask::class) {
             executeCommand("adb shell rm -rf /data/data/$packageName/shared_prefs/plugins.xml")
             
             println("=== Done ===")
-            println("Please restart Kime app to reload plugins")
+            println("Please restart Xime app to reload plugins")
         }
     }
 }
 
 tasks.register("uninstallApp", DefaultTask::class) {
     group = "plugin-dev"
-    description = "Completely uninstall Kime app (clear all data)"
+    description = "Completely uninstall Xime app (clear all data)"
     
     doLast {
-        val packageName = "com.kingzcheung.kime"
+        val packageName = "com.kingzcheung.xime"
         
-        println("=== Completely uninstalling Kime app ===")
+        println("=== Completely uninstalling Xime app ===")
         
         val devicesCheck = executeCommand("adb devices")
         if (!devicesCheck.contains("device")) {
@@ -261,11 +261,11 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.kingzcheung.kime"
+    namespace = "com.kingzcheung.xime"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.kingzcheung.kime"
+        applicationId = "com.kingzcheung.xime"
         minSdk = 28
         targetSdk = 35
         versionCode = 12
@@ -351,7 +351,7 @@ android {
 }
 
 android.applicationVariants.all {
-    val appName = "Kime"
+    val appName = "Xime"
     outputs.all {
         val abi = filters.find { it.filterType.toString() == "ABI" }?.identifier ?: "universal"
         (this as BaseVariantOutputImpl).outputFileName = "$appName-$versionName-$abi.apk"

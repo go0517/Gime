@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <activity
-            android:name="com.kingzcheung.kime.plugin.core.security.crash.CrashActivity"
+            android:name="com.kingzcheung.xime.plugin.core.security.crash.CrashActivity"
             android:exported="false"
             android:launchMode="singleInstance"
             android:excludeFromRecents="true"

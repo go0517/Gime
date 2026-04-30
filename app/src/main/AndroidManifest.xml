@@ -14,12 +14,12 @@
     <!-- 查询已安装的插件应用 -->
     <queries>
         <intent>
-            <action android:name="com.kingzcheung.kime.plugin.EXTENSION" />
+            <action android:name="com.kingzcheung.xime.plugin.EXTENSION" />
         </intent>
     </queries>
 
     <application
-        android:name=".KimeApplication"
+        android:name=".XimeApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -27,14 +27,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Kime"
+        android:theme="@style/Theme.Xime"
         tools:targetApi="31">
         
         <!-- 主Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Kime">
+            android:theme="@style/Theme.Xime">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -45,11 +45,11 @@
         <activity
             android:name=".ui.HostProxyActivity"
             android:exported="true"
-            android:theme="@style/Theme.Kime" />
+            android:theme="@style/Theme.Xime" />
         
         <!-- 输入法服务 -->
         <service
-            android:name=".service.KimeInputMethodService"
+            android:name=".service.XimeInputMethodService"
             android:exported="true"
             android:label="@string/ime_service_label"
             android:permission="android.permission.BIND_INPUT_METHOD">
@@ -74,7 +74,7 @@
         <!-- 插件 ContentProvider 代理 -->
         <provider
             android:name=".provider.HostProvider"
-            android:authorities="com.kingzcheung.kime.plugin.proxy"
+            android:authorities="com.kingzcheung.xime.plugin.proxy"
             android:exported="true" />
         
     </application>

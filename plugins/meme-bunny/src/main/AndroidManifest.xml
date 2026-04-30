@@ -10,14 +10,14 @@
             android:name=".PluginDeclaration"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.kingzcheung.kime.plugin.EXTENSION" />
+                <action android:name="com.kingzcheung.xime.plugin.EXTENSION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         
         <meta-data
             android:name="plugin.entryClass"
-            android:value="com.kingzcheung.kime.plugin.emoji.EmojiStickerPlugin" />
+            android:value="com.kingzcheung.xime.plugin.emoji.EmojiStickerPlugin" />
         
         <meta-data
             android:name="plugin.description"

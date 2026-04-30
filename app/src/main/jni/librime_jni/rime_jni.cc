@@ -1,4 +1,4 @@
-// Kime Rime JNI 接口
+// Xime Rime JNI 接口
 // 基于 trime 的实现
 
 #include <rime_api.h>
@@ -11,7 +11,7 @@
 #include <cstring>   // for strcmp
 #include <utility>   // for std::pair
 
-#define LOG_TAG "KimeRime"
+#define LOG_TAG "XimeRime"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
@@ -43,7 +43,7 @@ public:
         traits.log_dir = log_dir.c_str();  // 启用文件日志，写入到 user_data_dir/logs/
         traits.min_log_level = 1;  // 只记录 WARNING 及以上级别，避免过多 INFO 日志
         traits.app_name = "rime.kime";
-        traits.distribution_name = "Kime";
+        traits.distribution_name = "Xime";
         traits.distribution_code_name = "kime";
         traits.distribution_version = "1.0.0";
 
@@ -498,7 +498,7 @@ extern "C" {
 
 // 初始化 Rime 引擎
 JNIEXPORT void JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeInitialize(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeInitialize(
     JNIEnv* env,
     jobject thiz,
     jstring user_data_dir,
@@ -516,7 +516,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeInitialize(
 
 // 检查是否正在维护
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeIsMaintaining(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeIsMaintaining(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -525,7 +525,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeIsMaintaining(
 
 // 获取当前方案
 JNIEXPORT jstring JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetCurrentSchema(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeGetCurrentSchema(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -535,7 +535,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetCurrentSchema(
 
 // 处理按键输入
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeProcessKey(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeProcessKey(
     JNIEnv* env,
     jobject thiz,
     jint keycode,
@@ -546,7 +546,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeProcessKey(
 
 // 获取候选词列表
 JNIEXPORT jobjectArray JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetCandidates(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeGetCandidates(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -567,7 +567,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetCandidates(
 
 // 获取候选词列表（包含编码注释）
 JNIEXPORT jobjectArray JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetCandidatesWithComments(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeGetCandidatesWithComments(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -596,7 +596,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetCandidatesWithComments(
 
 // 获取输入文本
 JNIEXPORT jstring JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetInput(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeGetInput(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -605,7 +605,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetInput(
 
 // 选择候选词
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeSelectCandidate(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeSelectCandidate(
     JNIEnv* env,
     jobject thiz,
     jint index
@@ -615,7 +615,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeSelectCandidate(
 
 // 提交文本
 JNIEXPORT jstring JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeCommit(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeCommit(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -625,7 +625,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeCommit(
 
 // 清除组合
 JNIEXPORT void JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeClearComposition(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeClearComposition(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -634,7 +634,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeClearComposition(
 
 // 切换中英文模式（ascii_mode）
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeToggleAsciiMode(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeToggleAsciiMode(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -643,7 +643,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeToggleAsciiMode(
 
 // 获取当前是否为英文模式
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeIsAsciiMode(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeIsAsciiMode(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -652,7 +652,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeIsAsciiMode(
 
 // 切换输入方案
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeSwitchSchema(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeSwitchSchema(
     JNIEnv* env,
     jobject thiz,
     jstring schema_id
@@ -665,7 +665,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeSwitchSchema(
 
 // 获取可用方案列表
 JNIEXPORT jobjectArray JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetAvailableSchemas(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeGetAvailableSchemas(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -687,7 +687,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeGetAvailableSchemas(
 
 // 销毁引擎
 JNIEXPORT void JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeDestroy(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeDestroy(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -697,7 +697,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeDestroy(
 
 // 部署
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeDeploy(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeDeploy(
     JNIEnv* env,
     jobject thiz
 ) {
@@ -707,7 +707,7 @@ Java_com_kingzcheung_kime_rime_RimeEngine_nativeDeploy(
 
 // 查询词汇编码
 JNIEXPORT jstring JNICALL
-Java_com_kingzcheung_kime_rime_RimeEngine_nativeLookupText(
+Java_com_kingzcheung_xime_rime_RimeEngine_nativeLookupText(
     JNIEnv* env,
     jobject thiz,
     jstring text

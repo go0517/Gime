@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: "Kime"
+  name: "曦码"
   text: "安卓五笔输入法"
   tagline: 基于 Rime 引擎构建，专注于简洁高效的中文输入体验
   actions:
@@ -11,7 +11,7 @@ hero:
       link: /plugins/PLUGIN_DEVELOPMENT_GUIDE
     - theme: alt
       text: GitHub
-      link: https://github.com/ximeiorg/Kime
+      link: https://github.com/ximeiorg/Xime
 
 features:
   - icon: ⌨️

@@ -30,7 +30,7 @@ static const OrtApi* GetApi() {
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_association_NativeOnnxEngine_nativeInitialize(
+Java_com_kingzcheung_xime_association_NativeOnnxEngine_nativeInitialize(
     JNIEnv* env, jobject thiz, jstring model_path) {
 
     std::lock_guard<std::mutex> lock(g_onnx_mutex);
@@ -103,7 +103,7 @@ Java_com_kingzcheung_kime_association_NativeOnnxEngine_nativeInitialize(
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
-Java_com_kingzcheung_kime_association_NativeOnnxEngine_nativePredict(
+Java_com_kingzcheung_xime_association_NativeOnnxEngine_nativePredict(
     JNIEnv* env, jobject thiz, jlongArray input_ids, jint top_k) {
 
     std::lock_guard<std::mutex> lock(g_onnx_mutex);
@@ -243,7 +243,7 @@ Java_com_kingzcheung_kime_association_NativeOnnxEngine_nativePredict(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_kingzcheung_kime_association_NativeOnnxEngine_nativeRelease(
+Java_com_kingzcheung_xime_association_NativeOnnxEngine_nativeRelease(
     JNIEnv* env, jobject thiz) {
 
     std::lock_guard<std::mutex> lock(g_onnx_mutex);
@@ -265,7 +265,7 @@ Java_com_kingzcheung_kime_association_NativeOnnxEngine_nativeRelease(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_kingzcheung_kime_association_NativeOnnxEngine_nativeIsInitialized(
+Java_com_kingzcheung_xime_association_NativeOnnxEngine_nativeIsInitialized(
     JNIEnv* env, jobject thiz) {
     std::lock_guard<std::mutex> lock(g_onnx_mutex);
     return g_session ? JNI_TRUE : JNI_FALSE;

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kingzcheung.kime.plugin.core"
+    namespace = "com.kingzcheung.xime.plugin.core"
     compileSdk = 36
 
     defaultConfig {

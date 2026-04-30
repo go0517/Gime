@@ -2,14 +2,14 @@
 # These rules ensure all plugin API interfaces are preserved
 
 # Keep all API interfaces and implementations
--keep class com.kingzcheung.kime.plugin.core.api.** { *; }
--keep interface com.kingzcheung.kime.plugin.core.api.** { *; }
+-keep class com.kingzcheung.xime.plugin.core.api.** { *; }
+-keep interface com.kingzcheung.xime.plugin.core.api.** { *; }
 
 # Keep all model classes
--keep class com.kingzcheung.kime.plugin.core.model.** { *; }
+-keep class com.kingzcheung.xime.plugin.core.model.** { *; }
 
 # Keep all runtime classes
--keep class com.kingzcheung.kime.plugin.core.runtime.** { *; }
+-keep class com.kingzcheung.xime.plugin.core.runtime.** { *; }
 
 # Keep Kotlin metadata
 -keep class kotlin.Metadata { *; }

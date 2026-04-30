@@ -1,4 +1,4 @@
-# Kime 测试指南
+# 曦码测试指南
 
 ## 测试架构
 
@@ -60,10 +60,10 @@
 ### 运行特定测试类
 ```bash
 # 单元测试
-./gradlew test --tests "com.kingzcheung.kime.settings.SchemaConfigHelperTest"
+./gradlew test --tests "com.kingzcheung.xime.settings.SchemaConfigHelperTest"
 
 # 仪器测试
-./gradlew connectedAndroidTest --tests "com.kingzcheung.kime.rime.RimeEngineTest"
+./gradlew connectedAndroidTest --tests "com.kingzcheung.xime.rime.RimeEngineTest"
 ```
 
 ### 运行所有测试

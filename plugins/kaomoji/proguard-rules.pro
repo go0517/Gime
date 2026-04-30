@@ -5,5 +5,5 @@
 -keep class kotlin.** { *; }
 -keepnames class kotlin.** { *; }
 
--keep class com.kingzcheung.kime.plugin.kaomoji.** { *; }
+-keep class com.kingzcheung.xime.plugin.kaomoji.** { *; }
 -keepattributes SourceFile,LineNumberTable

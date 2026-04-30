@@ -7,15 +7,15 @@ plugins {
 }
 
 android {
-    namespace = "com.kingzcheung.kime.plugin.emoji"
+    namespace = "com.kingzcheung.xime.plugin.emoji"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.kingzcheung.kime.plugin.emoji"
+        applicationId = "com.kingzcheung.xime.plugin.emoji"
         minSdk = 28
         targetSdk = 35
-        versionCode = 4
-        versionName = "2.0.0-beta1"
+        versionCode = 5
+        versionName = "2.0.0-beta2"
     }
 
     buildTypes {

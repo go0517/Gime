@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: "Kime 五笔输入法",
+  title: "曦码五笔输入法",
   description: "基于 Rime 引擎构建的 Android 五笔输入法",
   lang: 'zh-CN',
   themeConfig: {
@@ -45,12 +45,12 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/ximeiorg/Kime' }
+      { icon: 'github', link: 'https://github.com/ximeiorg/Xime' }
     ],
 
     footer: {
       message: '基于 GPLv3 许可发布',
-      copyright: 'Copyright © 2024 Kime'
+      copyright: 'Copyright © 2024 Xime'
     },
 
     search: {

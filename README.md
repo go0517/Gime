@@ -1,8 +1,10 @@
 <p align="center">
-  <img src="docs/logo.jpg" alt="Kime Logo" width="600">
+  <img src="docs/logo.jpg" alt="Xime Logo" width="600">
 </p>
 
-<h1 align="center">Kime - 安卓五笔输入法</h1>
+<h1 align="center">Xime（曦码） - 五笔输入法</h1>
+
+> 通过检索发现，“Kime” 已经是韩国输入法引擎的名称，为了避免与已有项目冲突，将名称改为 Xime。
 
 <p align="center">
   一款基于 <a href="https://rime.im/">Rime</a> 引擎构建的 Android 五笔输入法，专注于简洁高效的中文输入体验。
@@ -66,27 +68,27 @@
 
 ### 从 Release 下载
 
-1. 在 [Releases](https://github.com/ximeiorg/Kime/releases) 页面下载最新版本的 APK
+1. 在 [Releases](https://github.com/ximeiorg/Xime/releases) 页面下载最新版本的 APK
 2. 安装应用
-3. 在系统设置中启用 Kime 输入法
-4. 将 Kime 设为当前输入法
+3. 在系统设置中启用 Xime 输入法
+4. 将 Xime 设为当前输入法
 
 ### 手动构建安装
 
 1. 克隆项目并构建 APK
 2. 安装应用
-3. 在系统设置中启用 Kime 输入法
-4. 将 Kime 设为当前输入法
+3. 在系统设置中启用 Xime 输入法
+4. 将 Xime 设为当前输入法
 
 ## 使用文档
 
-详细使用说明请查看 [使用文档](https://kime.ximei.me)。
+详细使用说明请查看 [使用文档](https://xime.ximei.me)。
 
 ## 构建
 
 ```bash
 # 克隆项目（包含子模块）
-git clone --recursive https://github.com/ximeiorg/Kime.git
+git clone --recursive https://github.com/ximeiorg/Xime.git
 
 # 或者在已克隆的项目中初始化子模块
 git submodule update --init --recursive

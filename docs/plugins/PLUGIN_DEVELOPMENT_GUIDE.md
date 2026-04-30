@@ -1,12 +1,12 @@
-# Kime 插件开发完整指南
+# 曦码插件开发完整指南
 
 ## 插件系统架构
 
-Kime 采用动态加载插件架构，表情插件只提供数据，由主应用负责展示。
+曦码采用动态加载插件架构，表情插件只提供数据，由主应用负责展示。
 
 ```
 ┌─────────────────────────────────────────────┐
-│          主应用 (Kime APK)                   │
+│          主应用 (曦码 APK)                   │
 │                                              │
 │  ┌─────────────────────────────────────┐   │
 │  │   PluginManager                      │   │
@@ -42,7 +42,7 @@ Kime 采用动态加载插件架构，表情插件只提供数据，由主应用
 
 ### 插件类型
 
-Kime 目前只支持表情插件类型：
+曦码目前只支持表情插件类型：
 
 | 类型 | 接口 | 用途 |
 |------|------|------|
@@ -138,7 +138,7 @@ dependencies {
             android:name=".PluginDeclaration"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.kingzcheung.kime.plugin.EXTENSION" />
+                <action android:name="com.kingzcheung.xime.plugin.EXTENSION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -173,9 +173,9 @@ package com.example.plugin
 
 import android.content.Context
 import android.util.Log
-import com.kingzcheung.kime.plugin.core.api.EmojiItem
-import com.kingzcheung.kime.plugin.core.api.EmojiPlugin
-import com.kingzcheung.kime.plugin.core.model.PluginContext
+import com.kingzcheung.xime.plugin.core.api.EmojiItem
+import com.kingzcheung.xime.plugin.core.api.EmojiPlugin
+import com.kingzcheung.xime.plugin.core.model.PluginContext
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -332,11 +332,11 @@ data class PluginContext(
 
 ```bash
 # 1. 卸载旧版本
-adb uninstall com.kingzcheung.kime
+adb uninstall com.kingzcheung.xime
 adb uninstall com.example.kime.plugin.myplugin
 
 # 2. 安装新版本
-adb install app/build/outputs/apk/debug/Kime-xxx.apk
+adb install app/build/outputs/apk/debug/Xime-xxx.apk
 adb install my-plugin/build/outputs/apk/debug/my-plugin-xxx.apk
 ```
 
@@ -354,7 +354,7 @@ adb install my-plugin/build/outputs/apk/debug/my-plugin-xxx.apk
 
 **原因**：AndroidManifest intent-filter 配置错误
 
-**解决**：检查 `<action android:name="com.kingzcheung.kime.plugin.EXTENSION" />`
+**解决**：检查 `<action android:name="com.kingzcheung.xime.plugin.EXTENSION" />`
 
 ### 3. 插件加载失败
 
@@ -383,8 +383,8 @@ adb install my-plugin/build/outputs/apk/debug/my-plugin-xxx.apk
 
 ## 参考文档
 
-- [plugin-core 源码](https://github.com/ximeiorg/Kime/tree/main/plugin-core) - 核心实现
-- [现有插件实现](https://github.com/ximeiorg/Kime/tree/main/plugins) - 学习最佳实践
+- [plugin-core 源码](https://github.com/ximeiorg/Xime/tree/main/plugin-core) - 核心实现
+- [现有插件实现](https://github.com/ximeiorg/Xime/tree/main/plugins) - 学习最佳实践
 
 ## 版本兼容
 
