@@ -916,11 +916,12 @@ if (state.showKeyboardResize) {
                             val isAscii = state.isAsciiMode
                             if (!state.isComposing) {
                                 if (isAscii) {
+                                    val charToCommit = if (isShifted) char.uppercase() else char.lowercase()
                                     val currentPending = uiState.value.pendingEnglishText
-                                    val newPending = currentPending + char.lowercase()
+                                    val newPending = currentPending + charToCommit
                                     
                                     withContext(Dispatchers.Main) {
-                                        commitText(char.lowercase())
+                                        commitText(charToCommit)
                                         uiState.value = uiState.value.copy(
                                             pendingEnglishText = newPending,
                                             associationCandidates = emptyArray()
@@ -928,7 +929,7 @@ if (state.showKeyboardResize) {
                                     }
                                     
                                     needsUIUpdate = true
-                                    Log.d(TAG, "English mode: committed '$char', pending text '$newPending'")
+                                    Log.d(TAG, "English mode: committed '$charToCommit', pending text '$newPending'")
                                 } else {
                                     withContext(Dispatchers.Main) {
                                         commitText(char)
