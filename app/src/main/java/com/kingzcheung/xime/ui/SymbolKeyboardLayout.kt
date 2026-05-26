@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -50,8 +51,10 @@ fun SymbolKeyboardLayout(
     )
     
     var currentPageIndex by remember { mutableStateOf(0) }
-    val currentPage = symbolPages.getOrElse(currentPageIndex) { symbolPages[0] }
-    val hasMorePages = symbolPages.size > currentPageIndex + 1
+    val safePageIndex = currentPageIndex.coerceIn(0, symbolPages.size - 1)
+    val currentPage = symbolPages.getOrElse(safePageIndex) { symbolPages[0] }
+    val hasMorePages = symbolPages.size > safePageIndex + 1
+    val isLandscape = LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
     
     Box(modifier = modifier.background(keyboardBackgroundColor)) {
         Column(
@@ -59,7 +62,7 @@ fun SymbolKeyboardLayout(
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(keyboardBackgroundColor)
-                .padding(vertical = 8.dp, horizontal = 4.dp),
+                .padding(vertical = 8.dp, horizontal = if (isLandscape) 50.dp else 4.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
         currentPage.forEach { symbolRow ->
@@ -122,7 +125,7 @@ IconKeyButton(
             )
             
             KeyButton(
-                text = "${currentPageIndex + 1}/${symbolPages.size}",
+                text = "${safePageIndex + 1}/${symbolPages.size}",
                 onClick = { },
                 backgroundColor = keyBackgroundColor,
                 textColor = keyTextColor,
@@ -150,7 +153,7 @@ SwipeableIconKeyButton(
             backgroundColor = specialKeyBackgroundColor,
             iconColor = keyTextColor,
             modifier = Modifier.weight(1.2f),
-            swipeText = "清空",
+            swipeText = if (isLandscape) null else "清空",
             onSwipe = { onKeyPress("clear_composition") },
             onLongClick = { onKeyPress("delete") },
             onPress = { onKeyPressDown?.invoke("delete") }

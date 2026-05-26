@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -75,6 +77,8 @@ fun MenuBar(
     
     val textColor = if (isDarkTheme) Color(0xFFE8EAED) else Color(0xFF202124)
     val itemBgColor = if (isDarkTheme) Color(0xFF45474A) else Color.White
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
     
     val menuItems = listOf(
         MenuItem(rememberVectorPainter(Icons.AutoMirrored.TwoTone.Assignment), "剪贴板", onClipboard),
@@ -90,31 +94,48 @@ fun MenuBar(
         modifier = modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(16.dp),
+            .padding(horizontal = if (isLandscape) 50.dp else 16.dp, vertical = if (isLandscape) 8.dp else 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // 将8个项目排布在网格中，使用Grid-like布局
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            menuItems.chunked(4).forEach { rowItems ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    rowItems.forEach { item ->
-                        MenuItemButton(
-                            item = item,
-                            bgColor = itemBgColor,
-                            textColor = textColor,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    // 如果该行不足4个，填充空的Box以保持对齐
-                    repeat(4 - rowItems.size) {
-                        Spacer(modifier = Modifier.weight(1f))
+        if (isLandscape) {
+            // 横屏：一行 8 列
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                menuItems.forEach { item ->
+                    MenuItemButton(
+                        item = item,
+                        bgColor = itemBgColor,
+                        textColor = textColor,
+                        modifier = Modifier.weight(1f),
+                        isLandscape = true
+                    )
+                }
+            }
+        } else {
+            // 竖屏：2 行 × 4 列
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                menuItems.chunked(4).forEach { rowItems ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowItems.forEach { item ->
+                            MenuItemButton(
+                                item = item,
+                                bgColor = itemBgColor,
+                                textColor = textColor,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        repeat(4 - rowItems.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                 }
             }
@@ -127,29 +148,30 @@ fun MenuItemButton(
     item: MenuItem,
     bgColor: Color,
     textColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLandscape: Boolean = false
 ) {
     Column(
         modifier = modifier
-            .aspectRatio(1f)
+            .then(if (isLandscape) Modifier.height(72.dp) else Modifier.aspectRatio(1f))
             .clip(RoundedCornerShape(12.dp))
             .background(bgColor)
             .clickable { item.action() }
-            .padding(8.dp),
+            .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
             painter = item.icon,
             contentDescription = item.label,
-            tint = textColor.copy(alpha = 0.7f),  // 让图标颜色更浅一些
-            modifier = Modifier.size(24.dp)
+            tint = textColor.copy(alpha = 0.7f),
+            modifier = Modifier.size(if (isLandscape) 18.dp else 24.dp)
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = item.label,
             color = textColor,
-            fontSize = 10.sp,
+            fontSize = if (isLandscape) 9.sp else 10.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             maxLines = 1

@@ -489,7 +489,9 @@ fun KeyboardView(
                         )
                     }
                 }
-            } else if (!isVoiceMode) {
+            } else if (!isVoiceMode && !isLandscapeBottom) {
+                Spacer(modifier = Modifier.height(40.dp))
+            } else if (!isVoiceMode && isLandscapeBottom) {
                 Spacer(modifier = Modifier.height(15.dp))
             }
         }

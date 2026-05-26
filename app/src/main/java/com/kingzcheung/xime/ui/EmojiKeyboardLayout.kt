@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -88,60 +89,60 @@ object EmojiData {
             name = "动物",
             icon = "🐶",
             emojis = listOf(
-                "🐶", "🐱", "🐭", "hamster", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯",
+                "🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯",
                 "🦁", "🐮", "🐷", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔",
-                "企鹅", "🐦", "🐤", "🐣", "🐥", "🦆", "🦅", "🦉", "🦇", "🐺",
-                "🐗", "🐴", "🦄", "蜜蜂", "🐛", "🦋", "蜗牛", "🐞", "蚂蚁", "🦟",
-                "🦗", "蜘蛛", "🦂", "乌龟", "蛇", "🦎", "🦖", "🦕", "章鱼", "🦑",
-                "🦐", "龙虾", "螃蟹", "🐡", "🐠", "🐟", "🐬", "鲸鱼", "🐋", "🦈"
+                "🐧", "🐦", "🐤", "🐣", "🐥", "🦆", "🦅", "🦉", "🦇", "🐺",
+                "🐗", "🐴", "🦄", "🐝", "🐛", "🦋", "🐌", "🐞", "🐜", "🦟",
+                "🦗", "🕷️", "🦂", "🐢", "🐍", "🦎", "🦖", "🦕", "🐙", "🦑",
+                "🦐", "🦞", "🦀", "🐡", "🐠", "🐟", "🐬", "🐳", "🐋", "🦈"
             )
         ),
         EmojiCategory(
             name = "食物",
             icon = "🍎",
             emojis = listOf(
-                "🍎", "梨", "🍊", "🍋", "🍌", "西瓜", "葡萄", "草莓", "蓝莓", "🍈",
-                "樱桃", "桃子", "芒果", "菠萝", "椰子", "猕猴桃", "番茄", "茄子", "🥑", "🥦",
-                "白菜", "黄瓜", "辣椒", "青椒", "玉米", "胡萝卜", "大蒜", "洋葱", "土豆", "红薯",
-                "面包", "甜甜圈", "吐司", "法棍", "饼干", "奶酪", "鸡蛋", "煎蛋", "黄油", "薄饼",
-                "华夫饼", "培根", "牛排", "鸡腿", "排骨", "骨头", "热狗", "汉堡", "薯条", "披萨",
-                "大饼", "三明治", "卷饼", "沙拉", "塔可", "饭团", "米饭", "火锅", "炖菜", "奶酪锅"
+                "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈",
+                "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦",
+                "🥬", "🥒", "🌶️", "🫑", "🌽", "🥕", "🧄", "🧅", "🥔", "🍠",
+                "🍞", "🍩", "🥖", "🥖", "🍪", "🧀", "🥚", "🍳", "🧈", "🥞",
+                "🧇", "🥓", "🥩", "🍗", "🍖", "🦴", "🌭", "🍔", "🍟", "🍕",
+                "🫓", "🥪", "🌯", "🥗", "🌮", "🍙", "🍚", "🍲", "🥘", "🧀"
             )
         ),
         EmojiCategory(
             name = "活动",
             icon = "⚽",
             emojis = listOf(
-                "足球", "篮球", "橄榄球", "棒球", "垒球", "网球", "排球", "橄榄球", "飞盘", "台球",
-                "悠悠球", "乒乓球", "羽毛球", "冰球", "曲棍球", "长棍球", "板球", "飞盘", "回旋镖", "球门",
-                "高尔夫", "风筝", "射箭", "钓鱼", "潜水", "拳击", "武术", "跑步", "滑板", "轮滑",
-                "跳伞", "滑冰", "冰壶", "滑雪", "单板滑雪", "冰刀", "跳伞", "举重", "摔跤", "体操",
-                "击剑", "手球", "飞盘", "高尔夫", "赛马", "瑜伽", "冲浪", "游泳", "水球", "划船",
-                "攀岩", "山地车", "自行车", "奖章", "奖杯", "金牌", "银牌", "铜牌", "勋章", "马戏团"
+                "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱",
+                "🪀", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🥏", "🪃", "🥅",
+                "⛳", "🪁", "🏹", "🎣", "🤿", "🥊", "🥋", "🏃", "🛹", "🛼",
+                "🪂", "⛸️", "🥌", "⛷️", "🏂", "⛸️", "🪂", "🏋️", "🤼", "🤸",
+                "🤺", "🤾", "🥏", "⛳", "🏇", "🧘", "🏄", "🏊", "🤽", "🚣",
+                "🧗", "🚵", "🚴", "🎖️", "🏆", "🥇", "🥈", "🥉", "🎖️", "🎪"
             )
         ),
         EmojiCategory(
             name = "物品",
             icon = "💻",
             emojis = listOf(
-                "手表", "手机", "电话", "电脑", "键盘", "显示器", "打印机", "鼠标", "轨迹球", "游戏杆",
-                "压缩包", "光盘", "软盘", "光盘", "DVD", "录像带", "相机", "拍照", "摄像机", "电影",
-                "放映机", "胶片", "电话", "座机", "传呼机", "传真机", "电视", "收音机", "麦克风", "调音台",
-                "控制台", "指南针", "秒表", "计时器", "闹钟", "时钟", "沙漏", "沙漏", "天线", "电池",
-                "插头", "灯泡", "手电筒", "蜡烛", "油灯", "灭火器", "油桶", "钞票", "美元", "日元",
-                "欧元", "英镑", "钱袋", "信用卡", "钻石", "天平", "工具箱", "扳手", "锤子", "镐头"
+                "⌚", "📱", "☎️", "💻", "⌨️", "🖥️", "🖨️", "🖱️", "🖲️", "🕹️",
+                "🗜️", "💿", "💾", "📀", "📀", "📼", "📷", "📸", "📹", "🎬",
+                "📽️", "🎞️", "☎️", "📞", "📟", "📠", "📺", "📻", "🎤", "🎛️",
+                "🎮", "🧭", "⏱️", "⏲️", "⏰", "🕰️", "⏳", "⌛", "📡", "🔋",
+                "🔌", "💡", "🔦", "🕯️", "🪔", "🧯", "🛢️", "💵", "💵", "💴",
+                "💶", "💷", "👛", "💳", "💎", "⚖️", "🧰", "🔧", "🔨", "⛏️"
             )
         ),
         EmojiCategory(
             name = "符号",
             icon = "❤️",
             emojis = listOf(
-                "红心", "橙心", "黄心", "绿心", "蓝心", "紫心", "黑心", "白心", "棕心", "心碎",
-                "感叹号", "双心", "两心", "心跳", "心动", "闪亮心", "丘比特", "礼盒心", "回收", "和平",
-                "十字架", "星月", "印度教", "佛教", "犹太教", "六芒星", "犹太历", "道教", "东正教", "祈祷",
-                "蛇夫座", "白羊", "金牛", "双子", "巨蟹", "狮子", "天秤", "天蝎", "射手", "摩羯",
-                "水瓶", "双鱼", "身份证", "原子", "可行", "辐射", "生物危害", "手机关", "手机开",
-                "有", "无", "申", "营", "月", "星", "对抗", "白花", "得分", "秘密"
+                "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔",
+                "❗", "💕", "💕", "💓", "💗", "✨", "💘", "🎁", "♻️", "☮️",
+                "✝️", "☪️", "🕉️", "☸️", "✡️", "🔯", "✡️", "☯️", "☦️", "🙏",
+                "⛎", "♈", "♉", "♊", "♋", "♌", "♎", "♏", "♐", "♑",
+                "♒", "♓", "🪪", "⚛️", "✅", "☢️", "☣️", "📵", "📱",
+                "🈶", "🈚", "🈸", "🈺", "🌙", "⭐", "⚔️", "🏵️", "🏅", "㊙️"
             )
         )
     )
@@ -162,12 +163,15 @@ fun EmojiKeyboardLayout(
     var selectedCategoryIndex by remember { mutableStateOf(0) }
     
     val allCategories by ExtensionManager.emojiCategoriesFlow.collectAsStateWithLifecycle()
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val emojiColumns = if (isLandscape) 15 else 8
     
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(vertical = 8.dp, horizontal = 4.dp)
+            .padding(vertical = 8.dp, horizontal = if (isLandscape) 50.dp else 4.dp)
     ) {
         Box(
             modifier = Modifier
@@ -186,7 +190,8 @@ fun EmojiKeyboardLayout(
             ) {
                 if (currentCategory.isPlugin && currentCategory.emojiItems != null) {
                     val config = currentCategory.layoutConfig
-                    val columns = config?.columns ?: (if (currentCategory.emojiItems.any { it.imageUrl != null }) 6 else 8)
+                    val defaultCols = if (currentCategory.emojiItems.any { it.imageUrl != null }) 6 else 8
+                    val columns = config?.columns ?: if (isLandscape) 15 else defaultCols
                     val itemHeightDp = config?.itemHeightDp ?: (if (currentCategory.emojiItems.any { it.imageUrl != null }) 60 else 40)
                     
                     currentCategory.emojiItems.chunked(columns).forEach { rowItems ->
@@ -237,7 +242,7 @@ fun EmojiKeyboardLayout(
                     }
                 } else {
                     val emojis = currentCategory.emojis
-                    val columns = 8
+                    val columns = if (isLandscape) 15 else 8
                     
                     emojis.chunked(columns).forEach { rowEmojis ->
                         Row(
@@ -264,7 +269,7 @@ fun EmojiKeyboardLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(44.dp)
-                .padding(horizontal = 4.dp, vertical = 0.dp),
+                .padding(horizontal = if (isLandscape) 50.dp else 4.dp, vertical = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

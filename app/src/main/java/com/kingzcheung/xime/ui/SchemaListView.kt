@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,12 +44,15 @@ fun SchemaListView(
     val itemBgColor = if (isDarkTheme) Color(0xFF45474A) else Color.White
     val textColor = if (isDarkTheme) Color(0xFFE8EAED) else Color(0xFF202124)
     val subTextColor = if (isDarkTheme) Color(0xFF9AA0A6) else Color(0xFF5F6368)
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val columns = if (isLandscape) 8 else 4
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(16.dp),
+            .padding(horizontal = if (isLandscape) 50.dp else 16.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -64,11 +68,11 @@ fun SchemaListView(
                 )
             }
         } else {
-            val rows = schemas.chunked(4)
+            val rows = schemas.chunked(columns)
             rows.forEachIndexed { rowIndex, rowItems ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(if (isLandscape) 8.dp else 12.dp)
                 ) {
                     rowItems.forEach { schema ->
                         SchemaGridItem(
@@ -78,17 +82,18 @@ fun SchemaListView(
                             textColor = textColor,
                             accentColor = accentColor,
                             onSelect = { onSelectSchema(schema.schemaId) },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            isLandscape = isLandscape
                         )
                     }
-                    if (rowItems.size < 4) {
-                        repeat(4 - rowItems.size) {
+                    if (rowItems.size < columns) {
+                        repeat(columns - rowItems.size) {
                             Spacer(modifier = Modifier.weight(1f))
                         }
                     }
                 }
                 if (rowIndex < rows.size - 1) {
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(if (isLandscape) 8.dp else 12.dp))
                 }
             }
         }
@@ -103,15 +108,16 @@ private fun SchemaGridItem(
     textColor: Color,
     accentColor: Color,
     onSelect: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLandscape: Boolean = false
 ) {
     Column(
         modifier = modifier
-            .aspectRatio(1f)
+            .then(if (isLandscape) Modifier.height(72.dp) else Modifier.aspectRatio(1f))
             .clip(RoundedCornerShape(12.dp))
             .background(bgColor)
             .clickable { onSelect() }
-            .padding(8.dp),
+            .padding(if (isLandscape) 4.dp else 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -119,9 +125,9 @@ private fun SchemaGridItem(
             imageVector = Icons.Default.Keyboard,
             contentDescription = schema.name,
             tint = if (isSelected) accentColor else textColor,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(if (isLandscape) 18.dp else 24.dp)
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(if (isLandscape) 2.dp else 4.dp))
         Text(
             text = schema.name,
             color = if (isSelected) accentColor else textColor,
