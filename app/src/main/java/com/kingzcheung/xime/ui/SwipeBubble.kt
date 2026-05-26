@@ -228,8 +228,13 @@ fun SwipeBubble(
     
     android.util.Log.d("SwipeBubble", "SwipeBubble called: keyBounds=$keyBounds, keyboardWidth=$keyboardWidth")
     
-    val bubbleBgColor = if (isDarkTheme) KeyBackgroundDark else KeyBackground
-    val bubbleTextColor = if (isDarkTheme) Color(0xFFE8EAED) else Color(0xFF202124)
+    val bubbleBgColor = if (swipeState.isDanger) {
+        if (swipeState.isSwipeDown) Color(0xFF1A73E8) // 下滑撤回用主题蓝色
+        else Color(0xFFD93025) // 上滑清空用红色
+    } else if (isDarkTheme) KeyBackgroundDark else KeyBackground
+    val bubbleTextColor = if (swipeState.isDanger) {
+        Color.White
+    } else if (isDarkTheme) Color(0xFFE8EAED) else Color(0xFF202124)
     
     var actualBodyWidth by remember { mutableStateOf(0f) }
     val density = LocalDensity.current

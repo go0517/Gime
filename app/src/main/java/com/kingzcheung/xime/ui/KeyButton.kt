@@ -43,7 +43,8 @@ data class SwipeState(
     val isSwipeDown: Boolean = false,
     val charInfos: List<CharInfo> = emptyList(),
     val isPressed: Boolean = false,
-    val pressedText: String? = null
+    val pressedText: String? = null,
+    val isDanger: Boolean = false
 )
 
 @Composable
@@ -480,6 +481,9 @@ fun SwipeableIconKeyButton(
     var isDragging by remember { mutableStateOf(false) }
     var isSwipingUp by remember { mutableStateOf(false) }
     var isSwipingDown by remember { mutableStateOf(false) }
+    var isDangerZone by remember { mutableStateOf(false) }
+    var hasReachedClearThreshold by remember { mutableStateOf(false) }
+    var hasReachedUndoThreshold by remember { mutableStateOf(false) }
     var isLongPress by remember { mutableStateOf(false) }
     var hasTriggeredLongPress by remember { mutableStateOf(false) }
     var buttonBounds by remember { mutableStateOf(Rect(0f, 0f, 0f, 0f)) }
@@ -489,6 +493,10 @@ fun SwipeableIconKeyButton(
     val swipeLeftThreshold = -80f
     val bubbleShowThresholdUp = swipeUpThreshold * 0.3f
     val bubbleShowThresholdDown = swipeDownThreshold * 0.3f
+    
+    // 上滑清空/下滑撤回需要更大的滑动距离，防止误触
+    val clearActionThreshold = -120f
+    val undoActionThreshold = 120f
     
     LaunchedEffect(isLongPress) {
         if (isLongPress && onLongClick != null) {
@@ -555,16 +563,21 @@ fun SwipeableIconKeyButton(
                         hasTriggeredSwipeLeft = false
                         isSwipingUp = false
                         isSwipingDown = false
+                        isDangerZone = false
+                        hasReachedClearThreshold = false
+                        hasReachedUndoThreshold = false
                         onSwipeStateChange?.invoke(SwipeState(), buttonBounds)
                         onPress?.invoke()
                     },
                     onDragEnd = {
-                        if (isSwipingUp && !hasTriggeredSwipe && onSwipeUp != null) {
-                            hasTriggeredSwipe = true
+                        // 手指抬起时才执行，给用户反悔的机会
+                        if (hasReachedClearThreshold && onSwipeUp != null) {
                             onSwipeUp()
-                        } else if (isSwipingDown && !hasTriggeredSwipeDown && onSwipeDown != null) {
-                            hasTriggeredSwipeDown = true
+                        } else if (hasReachedUndoThreshold && onSwipeDown != null) {
                             onSwipeDown()
+                        } else if (isSwipingUp && !hasTriggeredSwipe && onSwipe != null) {
+                            hasTriggeredSwipe = true
+                            onSwipe()
                         } else if (dragOffsetY < swipeUpThreshold && !hasTriggeredSwipe && onSwipe != null) {
                             hasTriggeredSwipe = true
                             onSwipe()
@@ -578,6 +591,9 @@ fun SwipeableIconKeyButton(
                         isDragging = false
                         isSwipingUp = false
                         isSwipingDown = false
+                        isDangerZone = false
+                        hasReachedClearThreshold = false
+                        hasReachedUndoThreshold = false
                         isLongPress = false
                         onSwipeStateChange?.invoke(SwipeState(), buttonBounds)
                     },
@@ -591,6 +607,9 @@ fun SwipeableIconKeyButton(
                         isDragging = false
                         isSwipingUp = false
                         isSwipingDown = false
+                        isDangerZone = false
+                        hasReachedClearThreshold = false
+                        hasReachedUndoThreshold = false
                         isLongPress = false
                         onSwipeStateChange?.invoke(SwipeState(), buttonBounds)
                     },
@@ -616,15 +635,17 @@ fun SwipeableIconKeyButton(
                                 )
                             }
                             
-                            if (dragOffsetY < swipeUpThreshold && !hasTriggeredSwipe) {
-                                if (onSwipeUp != null) {
-                                    hasTriggeredSwipe = true
-                                    onSwipeUp()
-                                } else if (onSwipe != null) {
-                                    hasTriggeredSwipe = true
-                                    onSwipe()
-                                }
+                            // 上滑清空需要更大的滑动距离
+                            val inDanger = dragOffsetY < clearActionThreshold
+                            if (inDanger != isDangerZone) {
+                                isDangerZone = inDanger
+                                onSwipeStateChange?.invoke(
+                                    SwipeState(isSwiping = true, swipeText = swipeUpLabel, isSwipeDown = false, isDanger = inDanger),
+                                    buttonBounds
+                                )
                             }
+                            
+                            hasReachedClearThreshold = inDanger
                         }
                         
                         // 下滑
@@ -639,10 +660,17 @@ fun SwipeableIconKeyButton(
                                 )
                             }
                             
-                            if (dragOffsetY > swipeDownThreshold && !hasTriggeredSwipeDown && onSwipeDown != null) {
-                                hasTriggeredSwipeDown = true
-                                onSwipeDown()
+                            // 下滑撤回也需要更大的滑动距离
+                            val inDanger = dragOffsetY > undoActionThreshold
+                            if (inDanger != isDangerZone) {
+                                isDangerZone = inDanger
+                                onSwipeStateChange?.invoke(
+                                    SwipeState(isSwiping = true, swipeText = swipeDownLabel, isSwipeDown = true, isDanger = inDanger),
+                                    buttonBounds
+                                )
                             }
+                            
+                            hasReachedUndoThreshold = inDanger
                         }
                     }
                 )
