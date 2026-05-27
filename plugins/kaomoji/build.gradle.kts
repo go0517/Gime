@@ -14,8 +14,8 @@ android {
         applicationId = "com.kingzcheung.xime.plugin.kaomoji"
         minSdk = 28
         targetSdk = 35
-        versionCode = 5
-        versionName = "2.0.0-beta2"
+        versionCode = 6
+        versionName = "2.0.0"
     }
 
     buildTypes {
