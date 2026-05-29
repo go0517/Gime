@@ -252,7 +252,20 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
                 notifyDeploymentStatus(true, "正在加载输入法引擎...")
                 rimeEngine.initialize(userDataDir, sharedDataDir)
 
-                notifyDeploymentStatus(true, "正在编译词库...")
+                // 检查词库是否已部署（prism.bin 文件是否存在）
+                val deploymentDone = SettingsPreferences.isDeploymentDone(this@XimeInputMethodService)
+                val needsDeployment = !deploymentDone || !RimeConfigHelper.isDeploymentComplete(this@XimeInputMethodService)
+
+                if (needsDeployment) {
+                    // 首次部署：需要编译词库
+                    notifyDeploymentStatus(true, "正在编译词库...")
+                    rimeEngine.startMaintenance(false)
+                    SettingsPreferences.setDeploymentDone(this@XimeInputMethodService, true)
+                } else {
+                    // 词库已存在：快速刷新 schema 注册表，不显示"编译"提示
+                    rimeEngine.startMaintenance(false)
+                }
+
                 val sessionReady = rimeEngine.ensureSession()
                 if (sessionReady) {
                     Log.d(TAG, "initRimeEngine: Session ready")

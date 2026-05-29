@@ -7,6 +7,7 @@ import com.kingzcheung.xime.plugin.core.runtime.PluginManager
 object SettingsPreferences {
     private const val PREFS_NAME = "kime_settings"
     private const val KEY_CURRENT_SCHEMA = "current_schema"
+    private const val KEY_DEPLOYMENT_DONE = "deployment_done"
     private const val KEY_DARK_MODE = "dark_mode"
     
     private const val KEY_SOUND_ENABLED = "sound_enabled"
@@ -50,6 +51,14 @@ object SettingsPreferences {
     
     fun setCurrentSchema(context: Context, schemaId: String) {
         getPrefs(context).edit().putString(KEY_CURRENT_SCHEMA, schemaId).apply()
+    }
+    
+    fun isDeploymentDone(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_DEPLOYMENT_DONE, false)
+    }
+    
+    fun setDeploymentDone(context: Context, done: Boolean) {
+        getPrefs(context).edit().putBoolean(KEY_DEPLOYMENT_DONE, done).apply()
     }
     
     fun getDarkMode(context: Context): Int {
