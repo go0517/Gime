@@ -4,7 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import com.kingzcheung.xime.ui.LocalStretchFactor
 import com.kingzcheung.xime.settings.SettingsPreferences
@@ -294,6 +295,9 @@ fun KeyboardLayout(
                 }
                 
                 // 空格键 - 支持左右滑动控制光标、长按语音
+                val currentOnKeyPress by rememberUpdatedState(onKeyPress)
+                val currentOnKeyPressDown by rememberUpdatedState(onKeyPressDown)
+                val currentOnVoiceModeChange by rememberUpdatedState(onVoiceModeChange)
                 val scope = rememberCoroutineScope()
                 Box(
                     modifier = Modifier
@@ -307,10 +311,10 @@ fun KeyboardLayout(
                         )
                         .clip(RoundedCornerShape(8.dp))
                         .background(keyBackgroundColor)
-                        .pointerInput(onKeyPress) {
+                        .pointerInput(Unit) {
                             awaitEachGesture {
                                 val down = awaitFirstDown(requireUnconsumed = false)
-                                onKeyPressDown?.invoke("space")
+                                currentOnKeyPressDown?.invoke("space")
 
                                 // 启动长按检测
                                 var longPressTriggered = false
@@ -328,49 +332,39 @@ fun KeyboardLayout(
                                         PermissionHelper.requestRecordAudioPermission(context)
                                     } else {
                                         // 触发语音模式切换，外部状态变化后会显示 VoiceKeyboardLayout
-                                        onVoiceModeChange?.invoke(true)
+                                        currentOnVoiceModeChange?.invoke(true)
                                     }
                                 }
 
                                 // 跟踪水平滑动控制光标
-                                var dragX = 0f
                                 var isHorizontalSwipe = false
                                 val cursorThreshold = 60f
 
-                                do {
-                                    val event = awaitPointerEvent()
-                                    val change = event.changes.firstOrNull() ?: break
+                                // 使用 drag 检测水平滑动，drag 会在手指抬起后自动结束
+                                drag(down.id) { change ->
+                                    val dx = change.position.x - down.position.x
+                                    val dy = change.position.y - down.position.y
 
-                                    if (change.pressed) {
-                                        val dx = change.position.x - down.position.x
-                                        val dy = change.position.y - down.position.y
-
-                                        // 判断是否为水平滑动（水平位移远大于垂直位移）
-                                        if (kotlin.math.abs(dx) > cursorThreshold &&
-                                            kotlin.math.abs(dx) > kotlin.math.abs(dy) * 2f
-                                        ) {
-                                            if (!isHorizontalSwipe) {
-                                                isHorizontalSwipe = true
-                                                longPressJob.cancel()
-                                            }
-                                            val steps = (dx / cursorThreshold).toInt()
-                                            if (steps != 0) {
-                                                onKeyPress(if (steps > 0) "cursor_right" else "cursor_left")
-                                                dragX -= steps * cursorThreshold
-                                            }
+                                    // 判断是否为水平滑动（水平位移远大于垂直位移）
+                                    if (kotlin.math.abs(dx) > cursorThreshold &&
+                                        kotlin.math.abs(dx) > kotlin.math.abs(dy) * 2f
+                                    ) {
+                                        if (!isHorizontalSwipe) {
+                                            isHorizontalSwipe = true
+                                            longPressJob.cancel()
                                         }
-
-                                        // 更新累积偏移
-                                        dragX = dx
-                                        change.consume()
-                                    } else break
-                                } while (true)
+                                        val steps = (dx / cursorThreshold).toInt()
+                                        if (steps != 0) {
+                                            currentOnKeyPress(if (steps > 0) "cursor_right" else "cursor_left")
+                                        }
+                                    }
+                                }
 
                                 longPressJob.cancel()
 
                                 // 非滑动操作视为点击空格
                                 if (!longPressTriggered && !isHorizontalSwipe) {
-                                    onKeyPress("space")
+                                    currentOnKeyPress("space")
                                 }
                             }
                         },
