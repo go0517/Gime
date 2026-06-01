@@ -395,7 +395,8 @@ fun KeyboardView(
                                     modifier = Modifier.weight(1f).then(cursorMod),
                                     onVoiceModeChange = onVoiceModeChange,
                                     isVoiceMode = isVoiceMode,
-                                    onKeyPressDown = onKeyPressDown
+                                    onKeyPressDown = onKeyPressDown,
+                                    onCursorMove = onCursorMove
                                 )
                             }
                         }

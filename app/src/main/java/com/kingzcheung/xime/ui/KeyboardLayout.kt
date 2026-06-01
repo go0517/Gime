@@ -66,7 +66,8 @@ fun KeyboardLayout(
     onVoiceModeChange: ((Boolean) -> Unit)? = null,
     isVoiceMode: Boolean = false,
     modifier: Modifier = Modifier,
-    onKeyPressDown: ((String) -> Unit)? = null
+    onKeyPressDown: ((String) -> Unit)? = null,
+    onCursorMove: ((Int) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val swipeDownShowRootsEnabled = SettingsPreferences.isSwipeDownShowRootsEnabled(context)
@@ -298,6 +299,7 @@ fun KeyboardLayout(
                 val currentOnKeyPress by rememberUpdatedState(onKeyPress)
                 val currentOnKeyPressDown by rememberUpdatedState(onKeyPressDown)
                 val currentOnVoiceModeChange by rememberUpdatedState(onVoiceModeChange)
+                val currentOnCursorMove by rememberUpdatedState(onCursorMove)
                 val scope = rememberCoroutineScope()
                 Box(
                     modifier = Modifier
@@ -355,7 +357,7 @@ fun KeyboardLayout(
                                         }
                                         val steps = (dx / cursorThreshold).toInt()
                                         if (steps != 0) {
-                                            currentOnKeyPress(if (steps > 0) "cursor_right" else "cursor_left")
+                                            currentOnCursorMove?.invoke(if (steps > 0) 1 else -1)
                                         }
                                     }
                                 }
