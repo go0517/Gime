@@ -130,7 +130,8 @@ fun KeyboardView(
     modifier: Modifier = Modifier
 ) {
     var isShifted by remember { mutableStateOf(false) }
-    var keyboardMode by remember { mutableStateOf(KeyboardMode.FULL) }
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    var keyboardState by remember { mutableStateOf(initialKeyboardLayoutState(isAsciiMode)) }
     var currentRoute by remember { mutableStateOf<KeyboardRoute>(KeyboardRoute.Keyboard) }
 
     val keyBgColor = if (isDarkTheme) KeyBackgroundDark else KeyBackground
@@ -146,6 +147,11 @@ fun KeyboardView(
     // 每次重新开始输入时（inputSessionId 变化），重置导航状态到全键盘
     LaunchedEffect(state.inputSessionId) {
         currentRoute = KeyboardRoute.Keyboard
+    }
+
+    // isAsciiMode 变化时同步键盘状态（例如点击"英/中"键切换输入法）
+    LaunchedEffect(isAsciiMode) {
+        keyboardState = initialKeyboardLayoutState(isAsciiMode)
     }
 
     Box(modifier = modifier.background(keyboardBgColor)) {
@@ -181,7 +187,7 @@ fun KeyboardView(
                 },
                 onHideKeyboard = {
                     onHideKeyboard?.invoke()
-                    keyboardMode = KeyboardMode.FULL
+                    keyboardState = initialKeyboardLayoutState(isAsciiMode)
                     currentRoute = KeyboardRoute.Keyboard
                     isShifted = false
                 },
@@ -276,100 +282,68 @@ fun KeyboardView(
                         Modifier
                     }
 
-                    when (keyboardMode) {
-                        KeyboardMode.FULL -> {
-                            val configuration = LocalConfiguration.current
-                            val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-                            if (isLandscape) {
-                                SplitKeyboardLayout(
-                                    onKeyPress = { key ->
-                                        when (key) {
-                                            "shift" -> isShifted = !isShifted
-                                            "mode_change" -> keyboardMode = KeyboardMode.NUMBER
-                                            "emoji" -> currentRoute = KeyboardRoute.Emoji
-                                            else -> onKeyPress(key, isShifted)
-                                        }
-                                    },
-                                    isShifted = isShifted,
-                                    isAsciiMode = isAsciiMode,
-                                    schemaName = schemaName,
-                                    enterKeyText = enterKeyText,
-                                    isDarkTheme = isDarkTheme,
-                                    keyBackgroundColor = keyBgColor,
-                                    keyTextColor = keyTextColor,
-                                    specialKeyBackgroundColor = specialKeyBgColor,
-                                    keyboardBackgroundColor = keyboardBgColor,
-                                    modifier = Modifier.weight(1f).then(cursorMod),
-                                    onKeyPressDown = onKeyPressDown,
-                                    onGestureAction = onGestureAction
-                                )
-                            } else {
-                                KeyboardLayout(
-                                    onKeyPress = { key ->
-                                        when (key) {
-                                            "shift" -> isShifted = !isShifted
-                                            "mode_change" -> keyboardMode = KeyboardMode.NUMBER
-                                            "emoji" -> currentRoute = KeyboardRoute.Emoji
-                                            else -> onKeyPress(key, isShifted)
-                                        }
-                                    },
-                                    isShifted = isShifted,
-                                    isAsciiMode = isAsciiMode,
-                                    schemaName = schemaName,
-                                    currentSchemaId = currentSchemaId,
-                                    enterKeyText = enterKeyText,
-                                    isDarkTheme = isDarkTheme,
-                                    keyBackgroundColor = keyBgColor,
-                                    keyTextColor = keyTextColor,
-                                    specialKeyBackgroundColor = specialKeyBgColor,
-                                    keyboardBackgroundColor = keyboardBgColor,
-                                    modifier = Modifier.weight(1f).then(cursorMod),
-                                    onVoiceModeChange = onVoiceModeChange,
-                                    onCommitText = onCommitText,
-                                    isSttEnabled = isSttEnabled,
-                                    isVoiceMode = isVoiceMode,
-                                    onKeyPressDown = onKeyPressDown,
-                                    onCursorMove = onCursorMove,
-                                    onGestureAction = onGestureAction
-                                )
-                            }
-                        }
-                        KeyboardMode.NUMBER -> {
-                            NumberKeyboardLayout(
-                                onKeyPress = { key ->
-                                    when (key) {
-                                        "abc" -> keyboardMode = KeyboardMode.FULL
-                                        "symbol" -> keyboardMode = KeyboardMode.SYMBOL
-                                        "emoji" -> currentRoute = KeyboardRoute.Emoji
-                                        else -> onKeyPress(key, false)
-                                    }
-                                },
-                                keyBackgroundColor = keyBgColor,
-                                keyTextColor = keyTextColor,
-                                specialKeyBackgroundColor = specialKeyBgColor,
-                                keyboardBackgroundColor = keyboardBgColor,
-                                modifier = Modifier.weight(1f).then(cursorMod),
-                                onKeyPressDown = onKeyPressDown
+                    val fullScreenOnKeyPress: (String) -> Unit = { key ->
+                        when (key) {
+                            "shift" -> isShifted = !isShifted
+                            "mode_change" -> keyboardState = keyboardState.transition(
+                                KeyboardLayoutAction.SwitchToNumber, isAsciiMode
                             )
-                        }
-                        KeyboardMode.SYMBOL -> {
-                            SymbolKeyboardLayout(
-                                onKeyPress = { key ->
-                                    when (key) {
-                                        "abc" -> keyboardMode = KeyboardMode.FULL
-                                        "123" -> keyboardMode = KeyboardMode.NUMBER
-                                        else -> onKeyPress(key, false)
-                                    }
-                                },
-                                keyBackgroundColor = keyBgColor,
-                                keyTextColor = keyTextColor,
-                                specialKeyBackgroundColor = specialKeyBgColor,
-                                keyboardBackgroundColor = keyboardBgColor,
-                                modifier = Modifier.weight(1f).then(cursorMod),
-                                onKeyPressDown = onKeyPressDown
-                            )
+                            "emoji" -> currentRoute = KeyboardRoute.Emoji
+                            else -> onKeyPress(key, isShifted)
                         }
                     }
+                    val numberOnKeyPress: (String) -> Unit = { key ->
+                        when (key) {
+                            "abc" -> keyboardState = keyboardState.transition(
+                                KeyboardLayoutAction.SwitchToFull, isAsciiMode
+                            )
+                            "symbol" -> keyboardState = keyboardState.transition(
+                                KeyboardLayoutAction.SwitchToSymbol, isAsciiMode
+                            )
+                            "emoji" -> currentRoute = KeyboardRoute.Emoji
+                            else -> onKeyPress(key, false)
+                        }
+                    }
+                    val symbolOnKeyPress: (String) -> Unit = { key ->
+                        when (key) {
+                            "abc" -> keyboardState = keyboardState.transition(
+                                KeyboardLayoutAction.SwitchToFull, isAsciiMode
+                            )
+                            "123" -> keyboardState = keyboardState.transition(
+                                KeyboardLayoutAction.SwitchToNumber, isAsciiMode
+                            )
+                            else -> onKeyPress(key, false)
+                        }
+                    }
+                    val currentOnKeyPress = when (keyboardState) {
+                        is KeyboardLayoutState.Chinese,
+                        is KeyboardLayoutState.English -> fullScreenOnKeyPress
+                        is KeyboardLayoutState.Number -> numberOnKeyPress
+                        is KeyboardLayoutState.Symbol -> symbolOnKeyPress
+                    }
+                    KeyboardLayoutScreen(
+                        state = keyboardState,
+                        onKeyPress = currentOnKeyPress,
+                        isShifted = isShifted,
+                        isAsciiMode = isAsciiMode,
+                        isLandscape = isLandscape,
+                        schemaName = schemaName,
+                        enterKeyText = enterKeyText,
+                        isDarkTheme = isDarkTheme,
+                        keyBackgroundColor = keyBgColor,
+                        keyTextColor = keyTextColor,
+                        specialKeyBackgroundColor = specialKeyBgColor,
+                        keyboardBackgroundColor = keyboardBgColor,
+                        modifier = Modifier.weight(1f).then(cursorMod),
+                        onKeyPressDown = onKeyPressDown,
+                        onVoiceModeChange = onVoiceModeChange,
+                        onCommitText = onCommitText,
+                        isSttEnabled = isSttEnabled,
+                        isVoiceMode = isVoiceMode,
+                        onCursorMove = onCursorMove,
+                        onGestureAction = onGestureAction,
+                        currentSchemaId = currentSchemaId,
+                    )
                 }
             }
             // 间距：正值=键盘与底部的间隙，负值=缩减底部固定空白区
@@ -393,7 +367,7 @@ fun KeyboardView(
                             .clickable(
                                 onClick = {
                                     onHideKeyboard?.invoke()
-                                    keyboardMode = KeyboardMode.FULL
+                                    keyboardState = initialKeyboardLayoutState(isAsciiMode)
                                     currentRoute = KeyboardRoute.Keyboard
                                     isShifted = false
                                 }

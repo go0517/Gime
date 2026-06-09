@@ -586,8 +586,8 @@ fun IconKeyButton(
             .shadow(1.dp, RoundedCornerShape(8.dp), ambientColor = Color(0x80000000), spotColor = Color(0x80000000))
             .clip(RoundedCornerShape(8.dp))
             .background(
-                if (isPressed) darkenColor(backgroundColor, 0.05f)
-                else if (isHighlighted) backgroundColor.copy(alpha = 0.8f)
+                if (isPressed) darkenColor(backgroundColor, 0.1f)
+                else if (isHighlighted) darkenColor(backgroundColor, 0.2f)
                 else backgroundColor
             )
             .pointerInput(Unit) {
@@ -611,6 +611,18 @@ fun IconKeyButton(
             tint = iconColor,
             modifier = Modifier.size(iconSize)
         )
+
+        // 右上角小圆点指示 — 仅在 isHighlighted 时显示
+        if (isHighlighted) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(3.dp)
+                    .size(6.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(iconColor)
+            )
+        }
     }
 }
 
