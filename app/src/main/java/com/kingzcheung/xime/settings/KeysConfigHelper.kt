@@ -87,7 +87,7 @@ private fun parseKeyGestureConfig(map: com.charleskorn.kaml.YamlMap): KeyGesture
 private fun parseLongPress(node: com.charleskorn.kaml.YamlNode): LongPressConfig? {
     // 旧格式：纯数组 → 默认 display="key"
     if (node is YamlList) {
-        val values = node.items.map { parseGestureNode(it) }
+        val values = node.items.map { parseGestureNode(it) }.take(10)
         return LongPressConfig(display = "key", values = values)
     }
     // 新格式：对象 { display, values }
@@ -98,7 +98,7 @@ private fun parseLongPress(node: com.charleskorn.kaml.YamlNode): LongPressConfig
             val key = (k as? com.charleskorn.kaml.YamlScalar)?.content ?: continue
             when (key) {
                 "display" -> display = (v as? com.charleskorn.kaml.YamlScalar)?.content ?: "key"
-                "values" -> if (v is YamlList) values = v.items.map { parseGestureNode(it) }
+                "values" -> if (v is YamlList) values = v.items.map { parseGestureNode(it) }.take(10)
             }
         }
         return LongPressConfig(display = display, values = values)

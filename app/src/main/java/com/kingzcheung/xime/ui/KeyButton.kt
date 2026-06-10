@@ -212,8 +212,9 @@ fun KeyButton(
         )
         
         if (!swipeText.isNullOrEmpty()) {
+            val displayText = if (swipeText.length <= 2) swipeText else swipeText.take(2)
             Text(
-                text = swipeText,
+                text = displayText,
                 color = textColor.copy(alpha = 0.5f),
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Normal,
@@ -491,8 +492,9 @@ fun SwipeableKeyButton(
         )
         
         if (!swipeText.isNullOrEmpty()) {
+            val displayText = if (swipeText.length <= 2) swipeText else swipeText.take(2)
             Text(
-                text = swipeText,
+                text = displayText,
                 color = textColor.copy(alpha = 0.6f),
                 fontSize = swipeFontSize,
                 fontWeight = FontWeight.Medium,
@@ -503,7 +505,6 @@ fun SwipeableKeyButton(
         }
         
         if (!swipeDownKeyLabel.isNullOrEmpty()) {
-            // display:key �?label 最多显�?2 个字
             val displayText = if (swipeDownKeyLabel.length <= 2) swipeDownKeyLabel else swipeDownKeyLabel.take(2)
             Text(
                 text = displayText,
