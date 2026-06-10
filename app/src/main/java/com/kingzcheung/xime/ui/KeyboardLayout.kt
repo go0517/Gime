@@ -1136,7 +1136,7 @@ fun CompactSwipeableKeyButton(
     val view = LocalView.current
     val context = LocalContext.current
     val chaiPuaFontFamily = remember {
-        FontFamily(Font(context.assets, "ChaiPUA-0.2.7-snow.ttf"))
+        FontFamily(Font("ChaiPUA-0.2.7-snow.ttf", context.assets))
     }
 
     val density = LocalDensity.current
