@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import com.kingzcheung.xime.R
 import com.kingzcheung.xime.keyboard.KeyboardRoute
 import com.kingzcheung.xime.keyboard.ToolbarAction
+import com.kingzcheung.xime.settings.SettingsPreferences
 
 /**
  * 候选栏组件
@@ -76,12 +80,13 @@ fun CandidateBar(
     toolbarActions: List<ToolbarAction> = emptyList(),
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
-    val textColor = if (isDarkTheme) Color(0xFFE8EAED) else Color(0xFF202124)
     val displayCandidates = candidates.take(20)
     val hasMoreCandidates = candidates.size >= 5
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
     val horizontalPadding = if (isLandscape) 50.dp else 8.dp
+    val context = LocalContext.current
+    val showComments = SettingsPreferences.showCandidateComments(context)
     val hasMoreAssociation = associationCandidates.size >= 5
     val hasAnyMore = hasMoreCandidates || hasMoreAssociation
 
@@ -236,8 +241,14 @@ fun CandidateBar(
 //                Spacer(modifier = Modifier.width(2.dp))
                 }
 
+                val candidateListState = rememberLazyListState()
+                LaunchedEffect(displayCandidates) {
+                    candidateListState.scrollToItem(0)
+                }
+
                 LazyRow(
                     modifier = Modifier.weight(1f),
+                    state = candidateListState,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     itemsIndexed(displayCandidates, key = { index, candidate -> index }) { index, candidate ->
@@ -246,7 +257,7 @@ fun CandidateBar(
                             index = index,
                             onClick = { onCandidateSelect(index) },
                             textColor = textColor,
-                            comment = candidateComments.getOrElse(index) { "" },
+                            comment = if (showComments) candidateComments.getOrElse(index) { "" } else "",
                             isSelected = index == 0,
                             accentColor = accentColor
                         )

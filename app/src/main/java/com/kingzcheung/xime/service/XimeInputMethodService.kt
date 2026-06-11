@@ -50,6 +50,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import kotlinx.coroutines.asCoroutineDispatcher
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistry
@@ -109,6 +110,9 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
     private lateinit var keyboardContainer: VoiceKeyboardContainer
     
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val keyProcessingDispatcher = java.util.concurrent.Executors.newSingleThreadExecutor { r ->
+        Thread(r, "key-process").also { it.isDaemon = true }
+    }.asCoroutineDispatcher()
     
     private val mainHandler = Handler(Looper.getMainLooper())
     
@@ -123,6 +127,7 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
     private var isTrackingVoiceButtons = false
     private var voiceRecordingStarted = false
     private var lastClearedText: String = ""
+    private var isChineseMode = true
     
     private val calculatorEngine = com.kingzcheung.xime.calculator.CalculatorEngine()
     
@@ -562,9 +567,14 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
                                 }
                             },
                             onCursorMove = { direction ->
-                                serviceScope.launch(Dispatchers.Main) {
-                                    val keyCode = if (direction > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
-                                    sendDownUpKeyEvents(keyCode)
+                                val ic = currentInputConnection
+                                if (ic != null) {
+                                    val textBefore = ic.getTextBeforeCursor(Int.MAX_VALUE, 0)
+                                    val textAfter = ic.getTextAfterCursor(Int.MAX_VALUE, 0)
+                                    val selStart = textBefore?.length ?: 0
+                                    val totalLen = selStart + (textAfter?.length ?: 0)
+                                    val newSel = (selStart + direction).coerceIn(0, totalLen)
+                                    ic.setSelection(newSel, newSel)
                                 }
                             },
                             onGestureAction = { action, value ->
@@ -717,6 +727,9 @@ onVoiceModeChange = { enabled ->
                                onUpdateToolbarButtons = { buttons ->
                                    SettingsPreferences.setToolbarButtons(this@XimeInputMethodService, buttons)
                                    uiState.value = uiState.value.copy(toolbarButtons = buttons)
+                               },
+                               onKeyboardModeChange = { chineseMode ->
+                                   isChineseMode = chineseMode
                                }
                                 )
                          }
@@ -1167,11 +1180,7 @@ onVoiceModeChange = { enabled ->
     }
 
     private fun handleKeyPress(key: String, isShifted: Boolean) {
-        val targetDispatcher = when (key) {
-            "space", "enter", "delete", "clear_composition", "clear_all" -> Dispatchers.IO
-            else -> Dispatchers.Default
-        }
-        serviceScope.launch(targetDispatcher) {
+        serviceScope.launch(keyProcessingDispatcher) {
             val state = uiState.value
             var needsUIUpdate = false
             
@@ -1208,7 +1217,7 @@ onVoiceModeChange = { enabled ->
                         predictionManager.deleteLastChar()
                         Log.d(TAG, "Delete committed text, remaining: '${predictionManager.lastCommittedText}'")
                         
-                        if (!state.isAsciiMode && SettingsPreferences.isSmartPredictionEnabled(this@XimeInputMethodService) && predictionManager.lastCommittedText.isNotEmpty()) {
+                        if (!state.isAsciiMode && isChineseMode && SettingsPreferences.isSmartPredictionEnabled(this@XimeInputMethodService) && predictionManager.lastCommittedText.isNotEmpty()) {
                             val candidates = predictionManager.getChineseAssociations(predictionManager.lastCommittedText, 20)
                             uiState.value = uiState.value.copy(associationCandidates = candidates)
                         } else {
@@ -1587,7 +1596,7 @@ onVoiceModeChange = { enabled ->
                 candidateComments = emptyArray()
             )
         } else {
-            serviceScope.launch(Dispatchers.Default) {
+            serviceScope.launch(keyProcessingDispatcher) {
                 selectCandidateAsync(index)
             }
         }
@@ -1771,13 +1780,15 @@ onVoiceModeChange = { enabled ->
 
     override fun commitText(text: String) {
         currentInputConnection?.commitText(text, 1)
-        predictionManager.appendCommittedText(text)
-        
-        predictionManager.recordInput(text)
-        
-        mainHandler.post {
-            if (!uiState.value.isAsciiMode) {
-                getPredictionFromPlugin(predictionManager.lastCommittedText)
+
+        if (isChineseMode) {
+            predictionManager.appendCommittedText(text)
+            predictionManager.recordInput(text)
+
+            mainHandler.post {
+                if (!uiState.value.isAsciiMode) {
+                    getPredictionFromPlugin(predictionManager.lastCommittedText)
+                }
             }
         }
     }

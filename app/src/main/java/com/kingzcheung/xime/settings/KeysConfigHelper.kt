@@ -44,6 +44,25 @@ data class KeyboardConfig(
 )
 
 /**
+ * 键盘颜色配置，从 xime.yaml keyboard.colors 加载。
+ * 所有颜色值为 0xRRGGBB 格式（不含 alpha）。
+ */
+data class KeyboardColorsConfig(
+    val keyboardBgColor: Long = 0xE3E4E8,
+    val keyboardBgColorDark: Long = 0x202020,
+    val keyBgColor: Long = 0xFFFFFF,
+    val keyBgColorDark: Long = 0x4A4A4A,
+    val specialKeyBgColor: Long? = null,
+    val specialKeyBgColorDark: Long? = null,
+    val candidateBarBgColor: Long = 0xE3E4E8,
+    val candidateBarBgColorDark: Long = 0x202020,
+    val keyTextColor: Long = 0x202124,
+    val keyTextColorDark: Long = 0xE8EAED,
+    val candidateTextColor: Long = 0x1A73E8,
+    val candidateTextColorDark: Long = 0x8AB4F8,
+)
+
+/**
  * 从 YAML node 解析 KeyboardConfig。
  *
  * 支持两种格式：
@@ -145,6 +164,18 @@ data class ColorSchemeEntry(
     val name: String = "",
     @SerialName("primary_color")
     val primaryColor: Long = 0,
+    @SerialName("keyboard_bg_color")
+    val keyboardBgColor: Long? = null,
+    @SerialName("key_bg_color")
+    val keyBgColor: Long? = null,
+    @SerialName("special_key_bg_color")
+    val specialKeyBgColor: Long? = null,
+    @SerialName("candidate_bar_bg_color")
+    val candidateBarBgColor: Long? = null,
+    @SerialName("key_text_color")
+    val keyTextColor: Long? = null,
+    @SerialName("candidate_text_color")
+    val candidateTextColor: Long? = null,
 )
 
 @Serializable
@@ -191,6 +222,9 @@ object KeysConfigHelper {
     // 新：手势配置缓存
     private var keyGestureConfig: Map<String, KeyGestureConfig> = emptyMap()
     
+    // 键盘颜色配置缓存
+    private var keyboardColorsConfig: KeyboardColorsConfig = KeyboardColorsConfig()
+    
     /** 配置版本号，每次 loadConfig 时递增，用于 Compose 感知配置变更。 */
     private val _configVersion = MutableStateFlow(0)
     val configVersion: StateFlow<Int> = _configVersion.asStateFlow()
@@ -211,6 +245,8 @@ object KeysConfigHelper {
         try {
             // 键盘手势（从原始 YAML 手动解析）
             keyGestureConfig = parseKeyboardFromAssets(context) ?: emptyMap()
+            // 键盘颜色（从原始 YAML 手动解析）
+            keyboardColorsConfig = parseKeyboardColorsFromAssets(context)
             _configVersion.value++
             Log.d(TAG, "Loaded config: ${keyGestureConfig.size} keys (v${_configVersion.value})")
         } catch (e: Exception) {
@@ -228,6 +264,68 @@ object KeysConfigHelper {
         val custom = customText?.let { parseKeyboardYamlText(it) } ?: return default
         // 合并：自定义覆盖同名键，默认填充其余键
         return default + custom
+    }
+
+    /** 从 xime.yaml + xime.custom.yaml 合并解析键盘颜色配置。 */
+    private fun parseKeyboardColorsFromAssets(context: Context): KeyboardColorsConfig {
+        val defaultText = readAssetText(context, XIME_CONFIG_FILE) ?: return KeyboardColorsConfig()
+        val default = parseKeyboardColorsYamlText(defaultText) ?: return KeyboardColorsConfig()
+        val customText = readUserDataText(context, XIME_CUSTOM_CONFIG_FILE)
+            ?: readAssetText(context, XIME_CUSTOM_CONFIG_FILE) ?: return default
+        val custom = parseKeyboardColorsYamlText(customText)
+        return custom ?: default
+    }
+
+    /** 从 YAML 文本中提取 keyboard.colors 段。 */
+    private fun parseKeyboardColorsYamlText(yamlText: String): KeyboardColorsConfig? {
+        val root = yaml.parseToYamlNode(yamlText) as? YamlMap ?: return null
+        val keyboardNode = root["keyboard"] as? YamlMap ?: return null
+        val colorsNode = keyboardNode["colors"] as? YamlMap ?: return null
+        var kbBg = 0xE3E4E8L
+        var kbBgDark = 0x202020L
+        var kBg = 0xFFFFFFL
+        var kBgDark = 0x4A4A4AL
+        var spKeyBg: Long? = null
+        var spKeyBgDark: Long? = null
+        var candBg = 0xE3E4E8L
+        var candBgDark = 0x202020L
+        var kTxt = 0x202124L
+        var kTxtDark = 0xE8EAEDL
+        var candTxt = 0x1A73E8L
+        var candTxtDark = 0x8AB4F8L
+        for ((kNode, vNode) in colorsNode.entries) {
+            val key = (kNode as? YamlScalar)?.content ?: continue
+            val value = (vNode as? YamlScalar)?.content ?: continue
+            val hex = value.removePrefix("0x").toLongOrNull(16) ?: continue
+            when (key) {
+                "keyboard_bg_color" -> kbBg = hex
+                "keyboard_bg_color_dark" -> kbBgDark = hex
+                "key_bg_color" -> kBg = hex
+                "key_bg_color_dark" -> kBgDark = hex
+                "special_key_bg_color" -> spKeyBg = hex
+                "special_key_bg_color_dark" -> spKeyBgDark = hex
+                "candidate_bar_bg_color" -> candBg = hex
+                "candidate_bar_bg_color_dark" -> candBgDark = hex
+                "key_text_color" -> kTxt = hex
+                "key_text_color_dark" -> kTxtDark = hex
+                "candidate_text_color" -> candTxt = hex
+                "candidate_text_color_dark" -> candTxtDark = hex
+            }
+        }
+        return KeyboardColorsConfig(
+            keyboardBgColor = kbBg,
+            keyboardBgColorDark = kbBgDark,
+            keyBgColor = kBg,
+            keyBgColorDark = kBgDark,
+            specialKeyBgColor = spKeyBg,
+            specialKeyBgColorDark = spKeyBgDark,
+            candidateBarBgColor = candBg,
+            candidateBarBgColorDark = candBgDark,
+            keyTextColor = kTxt,
+            keyTextColorDark = kTxtDark,
+            candidateTextColor = candTxt,
+            candidateTextColorDark = candTxtDark,
+        )
     }
 
     /** 从 YAML 文本中提取 keyboard.keys 段。 */
@@ -327,6 +425,9 @@ object KeysConfigHelper {
     }
 
     // ── 新公开 API ──
+
+    /** 获取键盘颜色配置（从 xime.yaml keyboard.colors 加载）。 */
+    fun getKeyboardColors(): KeyboardColorsConfig = keyboardColorsConfig
 
     /** 获取某个按键的手势配置。 */
     fun getKeyGesture(key: String): KeyGestureConfig? = keyGestureConfig[key.lowercase()]
