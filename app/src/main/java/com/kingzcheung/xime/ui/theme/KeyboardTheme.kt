@@ -17,7 +17,25 @@ data class KeyboardColorScheme(
     val primaryContainerLight: Color = specialKeyLight,
     val primaryContainerDark: Color = specialKeyDark,
     val surfaceLight: Color = Color.White,
-    val surfaceDark: Color = Color(0xFF1C1B1F)
+    val surfaceDark: Color = Color(0xFF1C1B1F),
+    // 键盘背景色
+    val keyboardBgLight: Color = surfaceLight,
+    val keyboardBgDark: Color = surfaceDark,
+    // 按键颜色
+    val keyBgLight: Color = Color.White,
+    val keyBgDark: Color = Color(0xFF4A4A4A),
+    // 候选栏颜色
+    val candidateBarBgLight: Color = surfaceLight,
+    val candidateBarBgDark: Color = surfaceDark,
+    // 按键文字颜色
+    val keyTextColorLight: Color = Color(0xFF202124),
+    val keyTextColorDark: Color = Color(0xFFE8EAED),
+    // 候选文字颜色
+    val candidateTextColorLight: Color = Color(0xFF1A73E8),
+    val candidateTextColorDark: Color = Color(0xFF8AB4F8),
+    // 分隔线颜色
+    val dividerColorLight: Color = Color(0xFFDADCE0),
+    val dividerColorDark: Color = Color(0xFF3C4043),
 )
 
 object KeyboardThemes {
@@ -175,6 +193,14 @@ object KeyboardThemes {
         val cfgColor = longToColor(entry.primaryColor)
         val lightened = lightenColor(cfgColor)
         val veryLight = lightenColor(cfgColor, 0.8f)
+
+        val kbdBg = entry.keyboardBgColor?.let { longToColor(it) } ?: Color.White
+        val kbdBgDark = entry.keyboardBgColor?.let { longToColor(it).let { darkenColor(it) } } ?: Color(0xFF1C1B1F)
+        val keyBg = entry.keyBgColor?.let { longToColor(it) } ?: Color.White
+        val keyBgDark = entry.keyBgColor?.let { longToColor(it).let { darkenColor(it) } } ?: Color(0xFF4A4A4A)
+        val txtColor = entry.keyTextColor?.let { longToColor(it) } ?: Color(0xFF202124)
+        val txtColorDark = entry.keyTextColor?.let { longToColor(it).let { lightenColor(it) } } ?: Color(0xFFE8EAED)
+
         return KeyboardColorScheme(
             id = id,
             name = entry.name.ifEmpty { id },
@@ -187,7 +213,17 @@ object KeyboardThemes {
             primaryContainerLight = veryLight,
             primaryContainerDark = cfgColor,
             surfaceLight = Color.White,
-            surfaceDark = Color(0xFF1C1B1F)
+            surfaceDark = Color(0xFF1C1B1F),
+            keyboardBgLight = kbdBg,
+            keyboardBgDark = kbdBgDark,
+            keyBgLight = keyBg,
+            keyBgDark = keyBgDark,
+            candidateBarBgLight = kbdBg,
+            candidateBarBgDark = kbdBgDark,
+            keyTextColorLight = txtColor,
+            keyTextColorDark = txtColorDark,
+            candidateTextColorLight = entry.candidateTextColor?.let { longToColor(it) } ?: cfgColor,
+            candidateTextColorDark = entry.candidateTextColor?.let { longToColor(it).let { lightenColor(it) } } ?: lightened,
         )
     }
 
@@ -204,6 +240,14 @@ object KeyboardThemes {
         return Color(r.coerceIn(0f, 1f), g.coerceIn(0f, 1f), b.coerceIn(0f, 1f))
     }
 
+    /** 将颜色调暗（向黑色混合），用于从亮色生成暗色变体。 */
+    private fun darkenColor(color: Color, factor: Float = 0.7f): Color {
+        val r = color.red * factor
+        val g = color.green * factor
+        val b = color.blue * factor
+        return Color(r.coerceIn(0f, 1f), g.coerceIn(0f, 1f), b.coerceIn(0f, 1f))
+    }
+
     /** 应用配置覆盖，返回覆盖后的 KeyboardColorScheme。 */
     private fun applyConfigOverrides(scheme: KeyboardColorScheme): KeyboardColorScheme {
         val entry = configOverrides[scheme.id] ?: return scheme
@@ -215,6 +259,16 @@ object KeyboardThemes {
             accentDark = lightened,
             primaryLight = cfgColor,
             primaryDark = lightened,
+            keyboardBgLight = entry.keyboardBgColor?.let { longToColor(it) } ?: scheme.keyboardBgLight,
+            keyboardBgDark = entry.keyboardBgColor?.let { longToColor(it).let { darkenColor(it) } } ?: scheme.keyboardBgDark,
+            keyBgLight = entry.keyBgColor?.let { longToColor(it) } ?: scheme.keyBgLight,
+            keyBgDark = entry.keyBgColor?.let { longToColor(it).let { darkenColor(it) } } ?: scheme.keyBgDark,
+            candidateBarBgLight = entry.candidateBarBgColor?.let { longToColor(it) } ?: scheme.candidateBarBgLight,
+            candidateBarBgDark = entry.candidateBarBgColor?.let { longToColor(it).let { darkenColor(it) } } ?: scheme.candidateBarBgDark,
+            keyTextColorLight = entry.keyTextColor?.let { longToColor(it) } ?: scheme.keyTextColorLight,
+            keyTextColorDark = entry.keyTextColor?.let { longToColor(it).let { lightenColor(it) } } ?: scheme.keyTextColorDark,
+            candidateTextColorLight = entry.candidateTextColor?.let { longToColor(it) } ?: scheme.candidateTextColorLight,
+            candidateTextColorDark = entry.candidateTextColor?.let { longToColor(it).let { lightenColor(it) } } ?: scheme.candidateTextColorDark,
         )
     }
 
@@ -249,5 +303,35 @@ object KeyboardThemes {
     fun getSurfaceColor(themeId: String, isDark: Boolean): Color {
         val theme = getThemeById(themeId)
         return if (isDark) theme.surfaceDark else theme.surfaceLight
+    }
+
+    fun getKeyboardBackgroundColor(themeId: String, isDark: Boolean): Color {
+        val theme = getThemeById(themeId)
+        return if (isDark) theme.keyboardBgDark else theme.keyboardBgLight
+    }
+
+    fun getKeyBackgroundColor(themeId: String, isDark: Boolean): Color {
+        val theme = getThemeById(themeId)
+        return if (isDark) theme.keyBgDark else theme.keyBgLight
+    }
+
+    fun getCandidateBarBackgroundColor(themeId: String, isDark: Boolean): Color {
+        val theme = getThemeById(themeId)
+        return if (isDark) theme.candidateBarBgDark else theme.candidateBarBgLight
+    }
+
+    fun getKeyTextColor(themeId: String, isDark: Boolean): Color {
+        val theme = getThemeById(themeId)
+        return if (isDark) theme.keyTextColorDark else theme.keyTextColorLight
+    }
+
+    fun getCandidateTextColor(themeId: String, isDark: Boolean): Color {
+        val theme = getThemeById(themeId)
+        return if (isDark) theme.candidateTextColorDark else theme.candidateTextColorLight
+    }
+
+    fun getDividerColor(themeId: String, isDark: Boolean): Color {
+        val theme = getThemeById(themeId)
+        return if (isDark) theme.dividerColorDark else theme.dividerColorLight
     }
 }

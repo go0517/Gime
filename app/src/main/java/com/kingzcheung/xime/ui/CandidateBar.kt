@@ -76,7 +76,6 @@ fun CandidateBar(
     toolbarActions: List<ToolbarAction> = emptyList(),
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
-    val textColor = if (isDarkTheme) Color(0xFFE8EAED) else Color(0xFF202124)
     val displayCandidates = candidates.take(20)
     val hasMoreCandidates = candidates.size >= 5
     val configuration = LocalConfiguration.current

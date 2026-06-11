@@ -53,14 +53,7 @@ import com.kingzcheung.xime.keyboard.ToolbarButton
 import com.kingzcheung.xime.service.InputUIState
 import com.kingzcheung.xime.settings.SchemaInfo
 import com.kingzcheung.xime.speech.RecognitionState
-import com.kingzcheung.xime.ui.theme.DividerColor
-import com.kingzcheung.xime.ui.theme.DividerColorDark
-import com.kingzcheung.xime.ui.theme.KeyBackground
-import com.kingzcheung.xime.ui.theme.KeyBackgroundDark
-import com.kingzcheung.xime.ui.theme.KeyTextColor
-import com.kingzcheung.xime.ui.theme.KeyTextColorDark
-import com.kingzcheung.xime.ui.theme.KeyboardBackground
-import com.kingzcheung.xime.ui.theme.KeyboardBackgroundDark
+import com.kingzcheung.xime.settings.KeysConfigHelper
 import com.kingzcheung.xime.ui.theme.KeyboardThemes
 import com.kingzcheung.xime.ui.SplitWordsView
 import com.kingzcheung.xime.keyboard.GestureAction
@@ -137,14 +130,24 @@ fun KeyboardView(
     var keyboardState by remember { mutableStateOf(initialKeyboardLayoutState(isAsciiMode)) }
     var currentRoute by remember { mutableStateOf<KeyboardRoute>(KeyboardRoute.Keyboard) }
 
-    val keyBgColor = if (isDarkTheme) KeyBackgroundDark else KeyBackground
-    val keyboardBgColor = if (isDarkTheme) KeyboardBackgroundDark else KeyboardBackground
-    val keyTextColor = if (isDarkTheme) KeyTextColorDark else KeyTextColor
-    val specialKeyBgColor = KeyboardThemes.getSpecialKeyColor(themeId, isDarkTheme)
+    val kbColors = KeysConfigHelper.getKeyboardColors()
+    val longToColor: (Long) -> Color = { Color(0xFF000000 or it) }
+    val keyboardBgColor = if (isDarkTheme) longToColor(kbColors.keyboardBgColorDark)
+        else longToColor(kbColors.keyboardBgColor)
+    val keyBgColor = if (isDarkTheme) longToColor(kbColors.keyBgColorDark)
+        else longToColor(kbColors.keyBgColor)
+    val keyTextColor = if (isDarkTheme) longToColor(kbColors.keyTextColorDark)
+        else longToColor(kbColors.keyTextColor)
     val accentColor = KeyboardThemes.getAccentColor(themeId, isDarkTheme)
-    val candidateBarBg = keyboardBgColor
-    val candidateTextColor = keyTextColor
-    val dividerColor = if (isDarkTheme) DividerColorDark else DividerColor
+    val themeSpecialKeyColor = KeyboardThemes.getSpecialKeyColor(themeId, isDarkTheme)
+    val specialKeyBgColor = if (isDarkTheme) kbColors.specialKeyBgColorDark?.let { longToColor(it) }
+        ?: themeSpecialKeyColor
+        else kbColors.specialKeyBgColor?.let { longToColor(it) } ?: themeSpecialKeyColor
+    val candidateBarBg = if (isDarkTheme) longToColor(kbColors.candidateBarBgColorDark)
+        else longToColor(kbColors.candidateBarBgColor)
+    val candidateTextColor = if (isDarkTheme) longToColor(kbColors.candidateTextColorDark)
+        else longToColor(kbColors.candidateTextColor)
+    val dividerColor = if (isDarkTheme) Color(0xFF3C4043) else Color(0xFFDADCE0)
     val state = uiStateProvider()
     val clipboardTab = (currentRoute as? KeyboardRoute.Clipboard)?.tab ?: 0
     // 每次重新开始输入时（inputSessionId 变化），重置导航状态到全键盘
@@ -511,7 +514,7 @@ fun KeyboardView(
                 is KeyboardRoute.ToolbarCustomize -> ToolbarCustomizeView(
                     toolbarButtons = toolbarButtons,
                     keyTextColor = keyTextColor,
-                    keyBgColor = keyboardBgColor,
+                    keyBgColor = keyBgColor,
                     accentColor = accentColor,
                     onUpdateToolbarButtons = onUpdateToolbarButtons,
                     onDismiss = { currentRoute = KeyboardRoute.Keyboard },
