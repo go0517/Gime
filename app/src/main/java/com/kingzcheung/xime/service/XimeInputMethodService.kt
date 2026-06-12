@@ -1141,7 +1141,7 @@ onVoiceModeChange = { enabled ->
         
         if (pendingEnglish.isNotEmpty()) {
             serviceScope.launch {
-                val candidates = predictionManager.getEnglishAssociations(pendingEnglish, 5)
+                val candidates = predictionManager.getEnglishAssociations(pendingEnglish, PredictionManager.MAX_ASSOCIATION_COUNT)
                 Log.d(TAG, "English association for pending '$pendingEnglish': ${candidates.joinToString()}")
                 withContext(Dispatchers.Main) {
                     uiState.value = uiState.value.copy(associationCandidates = candidates)
@@ -1179,7 +1179,7 @@ onVoiceModeChange = { enabled ->
         
         if (pendingEnglish.isNotEmpty()) {
             serviceScope.launch {
-                val candidates = predictionManager.getEnglishAssociations(pendingEnglish, 5)
+                val candidates = predictionManager.getEnglishAssociations(pendingEnglish, PredictionManager.MAX_ASSOCIATION_COUNT)
                 Log.d(TAG, "English association for pending '$pendingEnglish': ${candidates.joinToString()}")
                 withContext(Dispatchers.Main) {
                     uiState.value = uiState.value.copy(associationCandidates = candidates)
@@ -1257,7 +1257,7 @@ onVoiceModeChange = { enabled ->
                         Log.d(TAG, "Delete committed text, remaining: '${predictionManager.lastCommittedText}'")
                         
                         if (!state.isAsciiMode && isChineseMode && SettingsPreferences.isSmartPredictionEnabled(this@XimeInputMethodService) && predictionManager.lastCommittedText.isNotEmpty()) {
-                            val candidates = predictionManager.getChineseAssociations(predictionManager.lastCommittedText, 20)
+                            val candidates = predictionManager.getChineseAssociations(predictionManager.lastCommittedText, PredictionManager.MAX_ASSOCIATION_COUNT)
                             uiState.value = uiState.value.copy(associationCandidates = candidates)
                         } else {
                             uiState.value = uiState.value.copy(
