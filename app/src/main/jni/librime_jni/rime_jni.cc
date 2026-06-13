@@ -566,15 +566,14 @@ public:
             LOGE("setPageSize: rime not available");
             return;
         }
+        // schema_open 直接打开方案的配置对象，修改内存中的 menu/page_size
         RimeConfig config;
-        if (rime->config_open("user", &config)) {
-            char path[256];
-            snprintf(path, sizeof(path), "patch/%s/menu/page_size", schema_id);
-            rime->config_set_int(&config, path, page_size);
-            LOGI("Set page_size=%d for schema '%s' at path '%s'", page_size, schema_id, path);
+        if (rime->schema_open(schema_id, &config)) {
+            rime->config_set_int(&config, "menu/page_size", page_size);
             rime->config_close(&config);
+            LOGI("Set schema '%s' menu/page_size=%d via schema_open", schema_id, page_size);
         } else {
-            LOGE("setPageSize: failed to open user config");
+            LOGE("setPageSize: schema_open failed for '%s'", schema_id);
         }
     }
 

@@ -1774,21 +1774,9 @@ onVoiceModeChange = { enabled ->
     
     private fun applyPageSizeSetting(schemaId: String) {
         val userPageSize = SettingsPreferences.getPageSize(this)
-        val customFile = File(filesDir, "rime/${schemaId}.custom.yaml")
         if (userPageSize > 0) {
-            val yaml = "patch:\n  menu/page_size: $userPageSize\n"
-            try {
-                customFile.parentFile?.mkdirs()
-                customFile.writeText(yaml)
-                Log.d(TAG, "Written ${customFile.path} with page_size=$userPageSize")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to write custom yaml", e)
-            }
-        } else {
-            if (customFile.exists()) {
-                customFile.delete()
-                Log.d(TAG, "Removed ${customFile.path} to revert to schema default")
-            }
+            rimeEngine.setPageSize(schemaId, userPageSize)
+            Log.d(TAG, "Set page_size=$userPageSize for schema '$schemaId' via schema_open API")
         }
     }
 
