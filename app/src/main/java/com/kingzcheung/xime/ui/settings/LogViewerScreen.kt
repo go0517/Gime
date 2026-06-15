@@ -78,6 +78,7 @@ fun LogViewerScreen(
                         putExtra(android.content.Intent.EXTRA_SUBJECT, event.subject)
                         putExtra(android.content.Intent.EXTRA_STREAM, event.uri)
                         addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        clipData = android.content.ClipData.newRawUri(null, event.uri)
                     }
                     val chooser = android.content.Intent.createChooser(shareIntent, "分享日志")
                     context.startActivity(chooser)
