@@ -121,7 +121,9 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
     }.asCoroutineDispatcher()
     
     private val keyJobs = Channel<Job>(Channel.UNLIMITED)
-    
+
+    private val uiEventChannel = Channel<suspend () -> Unit>(Channel.UNLIMITED)
+
     init {
         serviceScope.launch {
             keyJobs.consumeEach { job ->
@@ -132,6 +134,9 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
                     FileLogger.d(KEY_PERF, "Channel join took ${joinTime}ms")
                 }
             }
+        }
+        serviceScope.launch(Dispatchers.Main) {
+            uiEventChannel.consumeEach { work -> work() }
         }
     }
     
@@ -1590,26 +1595,71 @@ onVoiceModeChange = { enabled ->
             if (needsUIUpdate) {
                 val result = pendingResult
                 val textToCommit = committedText
-                val tMainEntry = System.nanoTime()
-                withContext(Dispatchers.Main) {
-                    val tMainStart = System.nanoTime()
-                    val mainDispatchDelay = (tMainStart - tMainEntry) / 1_000_000
-                    if (textToCommit != null) {
-                        commitText(textToCommit)
-                    }
-                    if (result != null) {
+                if (result != null) {
+                    val tEnqueue = System.nanoTime()
+                    uiEventChannel.trySend {
+                        val tStartMain = System.nanoTime()
+                        if (textToCommit != null) {
+                            commitText(textToCommit)
+                        }
                         updateUIWithResult(result)
-                    } else {
-                        updateUI()
+                        if (calculatorEngine.isActive()) {
+                            updateCalculatorCandidates()
+                        }
+                        val elapsed = (System.nanoTime() - tStartMain) / 1_000_000
+                        val queueDelay = (tStartMain - tEnqueue) / 1_000_000
+                        if (elapsed > 5) {
+                            FileLogger.d(KEY_PERF, "MainThread work: ${elapsed}ms, queue=${queueDelay}ms")
+                        }
                     }
-                    // 如果计算器有活跃表达式，在 updateUI/updateUIWithResult 之后
-                    // 重新应用计算器候选，避免被 Rime 候选覆盖
-                    if (calculatorEngine.isActive()) {
-                        updateCalculatorCandidates()
-                    }
-                    val mainElapsed = (System.nanoTime() - tMainStart) / 1_000_000
-                    if (mainElapsed > 5) {
-                        FileLogger.d(KEY_PERF, "MainThread work: ${mainElapsed}ms, dispatch=${mainDispatchDelay}ms")
+                } else {
+                    val capturedInputText = rimeEngine.getInput()
+                    val capturedCandidates = rimeEngine.getCandidatesWithComments()
+                    val capturedIsAscii = rimeEngine.isAsciiMode()
+                    val capturedHasNext = rimeEngine.hasNextPage()
+                    val capturedHasPrev = rimeEngine.hasPrevPage()
+                    val tEnqueue = System.nanoTime()
+                    uiEventChannel.trySend {
+                        val tStartMain = System.nanoTime()
+                        if (textToCommit != null) {
+                            commitText(textToCommit)
+                        }
+                        val pendingEnglish = candidateState.value.pendingEnglishText
+                        val (filteredTexts, filteredComments) = if (capturedIsAscii) {
+                            val filtered = capturedCandidates.filterNot { candidate ->
+                                candidate.text.any { it.code in 0x4E00..0x9FFF }
+                            }
+                            filtered.map { it.text }.toTypedArray() to filtered.map { it.comment }.toTypedArray()
+                        } else {
+                            capturedCandidates.map { it.text }.toTypedArray() to capturedCandidates.map { it.comment }.toTypedArray()
+                        }
+                        candidateState.value = candidateState.value.copy(
+                            inputText = capturedInputText,
+                            candidates = filteredTexts,
+                            candidateComments = filteredComments,
+                            isComposing = capturedInputText.isNotEmpty(),
+                            associationCandidates = if ((capturedIsAscii || !isChineseMode) && pendingEnglish.isEmpty()) emptyArray() else candidateState.value.associationCandidates,
+                            isShowingRecentClipboard = false,
+                            hasNextPage = capturedHasNext,
+                            hasPrevPage = capturedHasPrev
+                        )
+                        uiState.value = uiState.value.copy(isAsciiMode = capturedIsAscii)
+                        if (pendingEnglish.isNotEmpty()) {
+                            serviceScope.launch {
+                                val candidates = predictionManager.getEnglishAssociations(pendingEnglish, PredictionManager.MAX_ASSOCIATION_COUNT)
+                                withContext(Dispatchers.Main) {
+                                    candidateState.value = candidateState.value.copy(associationCandidates = candidates)
+                                }
+                            }
+                        }
+                        if (calculatorEngine.isActive()) {
+                            updateCalculatorCandidates()
+                        }
+                        val elapsed = (System.nanoTime() - tStartMain) / 1_000_000
+                        val queueDelay = (tStartMain - tEnqueue) / 1_000_000
+                        if (elapsed > 5) {
+                            FileLogger.d(KEY_PERF, "MainThread work: ${elapsed}ms, queue=${queueDelay}ms")
+                        }
                     }
                 }
             }
