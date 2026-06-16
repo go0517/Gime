@@ -1311,6 +1311,17 @@ onVoiceModeChange = { enabled ->
                         }
                         needsUIUpdate = true
                         Log.d(TAG, "Delete: cleared association candidates")
+                    } else if (candState.isShowingRecentClipboard) {
+                        // 清除候选栏的复制内容显示，不删除实际内容
+                        withContext(Dispatchers.Main) {
+                            candidateState.value = candidateState.value.copy(
+                                candidates = emptyArray(),
+                                candidateComments = emptyArray(),
+                                isShowingRecentClipboard = false
+                            )
+                        }
+                        needsUIUpdate = true
+                        Log.d(TAG, "Delete: cleared clipboard display")
                     } else {
                         val pendingEnglish = candState.pendingEnglishText
                         
