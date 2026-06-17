@@ -1309,65 +1309,53 @@ onVoiceModeChange = { enabled ->
                     calculatorEngine.handleDelete()
                     updateCalculatorCandidates()
                     
-                    // 优先清空联想词：如果存在联想词，退格键先清空联想词，不执行实际删除
-                    if (candState.associationCandidates.isNotEmpty()) {
+                    // 优先清空候选栏：无论联想词、候选词还是复制内容，按删除键先清空候选栏
+                    val hasCandidateContent = candState.candidates.isNotEmpty() ||
+                        candState.associationCandidates.isNotEmpty() ||
+                        candState.isShowingRecentClipboard
+                    
+                    if (hasCandidateContent) {
+                        // 如果有待处理的英文输入，需同步删除已提交的字符并清空 pendingEnglishText
+                        // 否则候选栏清除后 pendingEnglishText 仍在，会重新拉取联想词
+                        val pendingLen = candState.pendingEnglishText.length
                         withContext(Dispatchers.Main) {
-                            candidateState.value = candidateState.value.copy(
-                                associationCandidates = emptyArray()
-                            )
-                        }
-                        needsUIUpdate = true
-                        Log.d(TAG, "Delete: cleared association candidates")
-                    } else if (candState.isShowingRecentClipboard) {
-                        // 清除候选栏的复制内容显示，不删除实际内容
-                        withContext(Dispatchers.Main) {
-                            candidateState.value = candidateState.value.copy(
-                                candidates = emptyArray(),
-                                candidateComments = emptyArray(),
-                                isShowingRecentClipboard = false
-                            )
-                        }
-                        needsUIUpdate = true
-                        Log.d(TAG, "Delete: cleared clipboard display")
-                    } else {
-                        val pendingEnglish = candState.pendingEnglishText
-                        
-                        if (pendingEnglish.isNotEmpty()) {
-                            val newPending = pendingEnglish.dropLast(1)
-                            withContext(Dispatchers.Main) {
-                                sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
-                                candidateState.value = candidateState.value.copy(
-                                    pendingEnglishText = newPending,
-                                    associationCandidates = emptyArray()
-                                )
-                            }
-                            needsUIUpdate = true
-                            Log.d(TAG, "Delete English pending: '$newPending'")
-                        } else if (candState.isComposing || candState.inputText.isNotEmpty()) {
-                            rimeEngine.processKey(0xff08, 0)
-                            val result = rimeEngine.getProcessResult(true)
-                            if (result.inputText.isEmpty()) {
-                                rimeEngine.clearComposition()
-                            }
-                            uiEventChannel.trySend {
-                                updateUIWithResult(result)
-                                if (calculatorEngine.isActive()) updateCalculatorCandidates()
-                            }
-                        } else {
-                            predictionManager.deleteLastChar()
-                            Log.d(TAG, "Delete committed text, remaining: '${predictionManager.lastCommittedText}'")
-                            
-                            withContext(Dispatchers.Main) {
+                            repeat(pendingLen) {
                                 sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
                             }
-                            
                             candidateState.value = candidateState.value.copy(
                                 candidates = emptyArray(),
                                 candidateComments = emptyArray(),
                                 associationCandidates = emptyArray(),
-                                isShowingRecentClipboard = false
+                                isShowingRecentClipboard = false,
+                                pendingEnglishText = ""
                             )
                         }
+                        needsUIUpdate = true
+                        Log.d(TAG, "Delete: cleared candidate bar (candidates=${candState.candidates.size}, assoc=${candState.associationCandidates.size}, clipboard=${candState.isShowingRecentClipboard})")
+                    } else if (candState.isComposing || candState.inputText.isNotEmpty()) {
+                        rimeEngine.processKey(0xff08, 0)
+                        val result = rimeEngine.getProcessResult(true)
+                        if (result.inputText.isEmpty()) {
+                            rimeEngine.clearComposition()
+                        }
+                        uiEventChannel.trySend {
+                            updateUIWithResult(result)
+                            if (calculatorEngine.isActive()) updateCalculatorCandidates()
+                        }
+                    } else {
+                        predictionManager.deleteLastChar()
+                        Log.d(TAG, "Delete committed text, remaining: '${predictionManager.lastCommittedText}'")
+                        
+                        withContext(Dispatchers.Main) {
+                            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+                        }
+                        
+                        candidateState.value = candidateState.value.copy(
+                            candidates = emptyArray(),
+                            candidateComments = emptyArray(),
+                            associationCandidates = emptyArray(),
+                            isShowingRecentClipboard = false
+                        )
                     }
                 }
                 "clear_composition" -> {
