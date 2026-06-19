@@ -104,8 +104,8 @@ keyboard:
     l: { tap: { label: "中", action: "commit", value: "l" }, swipe_up: "）", long_press: { display: "bubble", values: ["l", "L"] } }
 
     # ── 第三行 ──
-    z: { tap: { label: "難", action: "commit", value: "z" }, swipe_up: "*", long_press: { display: "bubble", values: [ "z","Z"] } }
-    x: { tap: { label: "卜", action: "commit", value: "x" }, swipe_up: "@", long_press: { display: "bubble", values: ["x", "X"] } }
+    z: { tap: { label: "*", action: "commit", value: "z" }, swipe_up: "*", long_press: { display: "bubble", values: [ "z","Z"] } }
+    x: { tap: { label: "難卜", action: "commit", value: "x" }, swipe_up: "@", long_press: { display: "bubble", values: ["x", "X"] } }
     c: { tap: { label: "金", action: "commit", value: "c" }, swipe_up: "、", long_press: { display: "bubble", values: ["c", "C", "ç"] } }
     v: { tap: { label: "女", action: "commit", value: "v" }, swipe_up: "？", long_press: { display: "bubble", values: ["v", "V"] } }
     b: { tap: { label: "月", action: "commit", value: "b" }, swipe_up: "！", long_press: { display: "bubble", values: ["b", "B"] } }
