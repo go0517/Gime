@@ -11,6 +11,7 @@ import com.charleskorn.kaml.YamlScalar
 import com.charleskorn.kaml.YamlList
 import com.kingzcheung.xime.BuildConfig
 import com.kingzcheung.xime.keyboard.GestureAction
+import androidx.compose.runtime.mutableStateOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -246,8 +247,9 @@ object KeysConfigHelper {
         swipeDownEnglish = getDefaultSwipeDownEnglish()
     )
 
-    // 新：手势配置缓存
-    private var keyGestureConfig: Map<String, KeyGestureConfig> = emptyMap()
+    // 手势配置缓存（mutableStateOf 让 Compose 直接观察变更）
+    private val _keyGestureConfig = mutableStateOf<Map<String, KeyGestureConfig>>(emptyMap())
+    val keyGestureConfig: Map<String, KeyGestureConfig> get() = _keyGestureConfig.value
     
     // 键盘颜色配置缓存
     private var keyboardColorsConfig: KeyboardColorsConfig = KeyboardColorsConfig()
@@ -274,7 +276,7 @@ object KeysConfigHelper {
     private fun loadXimeConfig(context: Context) {
         try {
             // 键盘手势（从原始 YAML 手动解析）
-            keyGestureConfig = parseKeyboardFromAssets(context) ?: emptyMap()
+            _keyGestureConfig.value = parseKeyboardFromAssets(context) ?: emptyMap()
             // 键盘颜色（从原始 YAML 手动解析）
             keyboardColorsConfig = parseKeyboardColorsFromAssets(context)
             // 键盘阴影（从原始 YAML 手动解析）
