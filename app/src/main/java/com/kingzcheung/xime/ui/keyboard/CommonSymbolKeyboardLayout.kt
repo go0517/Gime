@@ -87,7 +87,7 @@ fun CommonSymbolKeyboardLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(vertical = 8.dp, horizontal = 4.dp),
+                .padding(start = 4.dp, end = 4.dp, bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(KeyboardDimensions.RowSpacing),
         ) {
             Row(
