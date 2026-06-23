@@ -63,7 +63,7 @@ fun KeyboardView(
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     SideEffect {
-        val active = keyboardState is KeyboardLayoutState.Chinese && currentRoute == KeyboardRoute.Keyboard
+        val active = (keyboardState is KeyboardLayoutState.Chinese || keyboardState is KeyboardLayoutState.Stroke) && currentRoute == KeyboardRoute.Keyboard
         callbacks.onKeyboardModeChange?.invoke(active)
     }
 
@@ -71,8 +71,9 @@ fun KeyboardView(
         viewModel.setRoute(KeyboardRoute.Keyboard)
     }
 
-    LaunchedEffect(state.isAsciiMode) {
-        viewModel.setKeyboardState(initialKeyboardLayoutState(state.isAsciiMode))
+    LaunchedEffect(state.isAsciiMode, state.currentSchemaId) {
+        val newState = initialKeyboardLayoutState(state.isAsciiMode, state.currentSchemaId)
+        viewModel.setKeyboardState(newState)
     }
 
     val kbColors = KeysConfigHelper.getKeyboardColors()
@@ -163,7 +164,7 @@ fun KeyboardView(
                     },
                     onHideKeyboard = {
                         callbacks.onHideKeyboard?.invoke()
-                        viewModel.resetKeyboard(state.isAsciiMode)
+                        viewModel.resetKeyboard(state.isAsciiMode, state.currentSchemaId)
                     },
                     onShowMoreCandidates = { viewModel.setRoute(KeyboardRoute.CandidatePage) },
                     onInputTextClick = {
@@ -269,9 +270,9 @@ fun KeyboardView(
                     }
                     val numberOnKeyPress: (String) -> Unit = { key ->
                         when (key) {
-                            "abc" -> viewModel.setKeyboardState(keyboardState.transition(
-                                KeyboardLayoutAction.SwitchToFull, state.isAsciiMode
-                            ))
+                            "abc" -> viewModel.setKeyboardState(
+                                initialKeyboardLayoutState(state.isAsciiMode, state.currentSchemaId)
+                            )
                             "symbol" -> viewModel.setRoute(KeyboardRoute.Symbol)
                             "emoji" -> viewModel.setRoute(KeyboardRoute.Emoji)
                             else -> callbacks.onKeyPress(key, false)
@@ -279,9 +280,9 @@ fun KeyboardView(
                     }
                     val symbolOnKeyPress: (String) -> Unit = { key ->
                         when (key) {
-                            "abc" -> viewModel.setKeyboardState(keyboardState.transition(
-                                KeyboardLayoutAction.SwitchToFull, state.isAsciiMode
-                            ))
+                            "abc" -> viewModel.setKeyboardState(
+                                initialKeyboardLayoutState(state.isAsciiMode, state.currentSchemaId)
+                            )
                             "?123" -> {
                                 viewModel.setKeyboardState(keyboardState.transition(
                                     KeyboardLayoutAction.SwitchToNumber, state.isAsciiMode
@@ -292,6 +293,19 @@ fun KeyboardView(
                         }
                     }
                     val commonSymbolOnKeyPress: (String) -> Unit = { key ->
+                        when (key) {
+                            "abc" -> viewModel.setKeyboardState(
+                                initialKeyboardLayoutState(state.isAsciiMode, state.currentSchemaId)
+                            )
+                            "number" -> viewModel.setKeyboardState(keyboardState.transition(
+                                KeyboardLayoutAction.SwitchToNumber, state.isAsciiMode
+                            ))
+                            "symbol" -> viewModel.setRoute(KeyboardRoute.Symbol)
+                            "emoji" -> viewModel.setRoute(KeyboardRoute.Emoji)
+                            else -> callbacks.onKeyPress(key, false)
+                        }
+                    }
+                    val strokeOnKeyPress: (String) -> Unit = { key ->
                         when (key) {
                             "abc" -> viewModel.setKeyboardState(keyboardState.transition(
                                 KeyboardLayoutAction.SwitchToFull, state.isAsciiMode
@@ -309,6 +323,7 @@ fun KeyboardView(
                         is KeyboardLayoutState.English -> fullScreenOnKeyPress
                         is KeyboardLayoutState.Number -> numberOnKeyPress
                         is KeyboardLayoutState.CommonSymbol -> commonSymbolOnKeyPress
+                        is KeyboardLayoutState.Stroke -> strokeOnKeyPress
                         is KeyboardLayoutState.Symbol -> symbolOnKeyPress
                     }
                     CompositionLocalProvider(LocalSuppressCursorMove provides suppressCursorMove) {
@@ -342,7 +357,7 @@ fun KeyboardView(
                             .clickable(
                                 onClick = {
                                     callbacks.onHideKeyboard?.invoke()
-                                    viewModel.resetKeyboard(state.isAsciiMode)
+                                    viewModel.resetKeyboard(state.isAsciiMode, state.currentSchemaId)
                                 }
                             ),
                         contentAlignment = Alignment.Center

@@ -131,10 +131,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _currentRoute.value = route
     }
 
-    fun resetKeyboard(isAsciiMode: Boolean) {
+    fun resetKeyboard(isAsciiMode: Boolean, schemaId: String = "") {
         _isShifted.value = false
         _shiftMode.value = ShiftMode.OFF
-        _keyboardState.value = initialKeyboardLayoutState(isAsciiMode)
+        _keyboardState.value = initialKeyboardLayoutState(isAsciiMode, schemaId)
         _currentRoute.value = KeyboardRoute.Keyboard
     }
 
