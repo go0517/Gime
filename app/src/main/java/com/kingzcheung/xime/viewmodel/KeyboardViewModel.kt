@@ -22,6 +22,7 @@ data class KeyboardUiState(
     val candidates: List<String> = emptyList(),
     val candidateComments: List<String> = emptyList(),
     val inputText: String = "",
+    val preeditText: String = "",
     val isComposing: Boolean = false,
     val associationCandidates: List<String> = emptyList(),
     val hasNextPage: Boolean = false,

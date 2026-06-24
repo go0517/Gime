@@ -105,7 +105,7 @@ fun KeyboardView(
                 .fillMaxHeight()
         ) {
             val candidateBarState = remember(
-                state.candidates, state.candidateComments, state.inputText, state.isComposing,
+                state.candidates, state.candidateComments, state.inputText, state.preeditText, state.isComposing,
                 state.associationCandidates, state.isShowingRecentClipboard, state.hasNextPage,
                 state.isCalculatorMode,
             ) {
@@ -113,6 +113,7 @@ fun KeyboardView(
                     candidates = state.candidates,
                     candidateComments = state.candidateComments,
                     inputText = state.inputText,
+                    preeditText = state.preeditText,
                     isComposing = state.isComposing,
                     associationCandidates = state.associationCandidates,
                     isShowingRecentClipboard = state.isShowingRecentClipboard,

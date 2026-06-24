@@ -576,6 +576,7 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
                         if (state.isCompact && cand.isComposing) {
                             FloatingCandidateBar(
                                 inputText = cand.inputText,
+                                preeditText = cand.preeditText,
                                 candidates = cand.candidates,
                                 candidateComments = cand.candidateComments,
                                 isComposing = cand.isComposing,
@@ -596,6 +597,7 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
                                 candidates = cand.candidates,
                                 candidateComments = cand.candidateComments,
                                 inputText = cand.inputText,
+                                preeditText = cand.preeditText,
                                 isComposing = cand.isComposing,
                                 associationCandidates = if (cand.pendingEnglishText.isNotEmpty()) {
                                     listOf(cand.pendingEnglishText) + cand.associationCandidates
@@ -1238,6 +1240,7 @@ class XimeInputMethodService : InputMethodService(), LifecycleOwner, SavedStateR
         
         candidateState.value = candidateState.value.copy(
             inputText = result.inputText,
+            preeditText = result.preeditText,
             candidates = filteredTexts,
             candidateComments = filteredComments,
             isComposing = result.inputText.isNotEmpty(),
