@@ -92,7 +92,7 @@ fun MenuBar(
     val textColor = if (isDarkTheme) Color(0xFFE8EAED) else Color(0xFF202124)
     val itemBgColor = if (isDarkTheme) Color(0xFF45474A) else Color.White
     val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = !isFloatingMode && configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
     
     val clipboardIcon = rememberVectorPainter(Icons.AutoMirrored.TwoTone.Assignment)
     val quickSendIcon = rememberVectorPainter(Icons.TwoTone.Quickreply)
