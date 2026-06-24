@@ -58,12 +58,14 @@ fun KeyboardView(
     viewModel: KeyboardViewModel,
     state: KeyboardUiState,
     callbacks: KeyboardCallbacks,
+    floatingCardWidthDp: Int = 0,
     modifier: Modifier = Modifier,
 ) {
     val isShifted by viewModel.isShifted.collectAsStateWithLifecycle()
     val keyboardState by viewModel.keyboardState.collectAsStateWithLifecycle()
     val currentRoute by viewModel.currentRoute.collectAsStateWithLifecycle()
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = if (state.isFloatingMode) false
+        else LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     SideEffect {
         val active = (keyboardState is KeyboardLayoutState.Chinese || keyboardState is KeyboardLayoutState.Stroke) && currentRoute == KeyboardRoute.Keyboard
@@ -101,6 +103,15 @@ fun KeyboardView(
 
     val clipboardTab = (currentRoute as? KeyboardRoute.Clipboard)?.tab ?: 0
 
+    FloatingKeyboardContainer(
+        isFloatingMode = state.isFloatingMode,
+        scaleFactor = 0.85f,
+        cardWidthDp = floatingCardWidthDp,
+        offsetX = state.floatingOffsetX,
+        offsetY = state.floatingOffsetY,
+        onDrag = { dx, dy -> callbacks.onFloatingKeyboardDrag?.invoke(dx, dy) },
+        onDragEnd = { callbacks.onFloatingKeyboardDragEnd?.invoke() },
+    ) {
     Box(modifier = modifier.background(keyboardBgColor)) {
         Column(
             modifier = Modifier
@@ -141,6 +152,7 @@ fun KeyboardView(
                         ToolbarButton.PASTE -> ({ callbacks.onToolbarEditingAction?.invoke("paste") })
                         ToolbarButton.HOME -> ({ callbacks.onToolbarEditingAction?.invoke("home") })
                         ToolbarButton.END -> ({ callbacks.onToolbarEditingAction?.invoke("end") })
+                        ToolbarButton.FLOAT -> ({ callbacks.onFloatingModeChange?.invoke(!state.isFloatingMode) })
                     }
                     ToolbarAction(button, onClick)
                 },
@@ -416,6 +428,8 @@ fun KeyboardView(
                 onSchemaList = { viewModel.setRoute(KeyboardRoute.SchemaList) },
                 onToggleDarkMode = { callbacks.onToggleDarkMode?.invoke() },
                 onToolbarCustomize = { viewModel.setRoute(KeyboardRoute.ToolbarCustomize) },
+                onFloatingModeToggle = { callbacks.onFloatingModeChange?.invoke(!state.isFloatingMode); viewModel.setRoute(KeyboardRoute.Keyboard) },
+                isFloatingMode = state.isFloatingMode,
                     modifier = Modifier.fillMaxWidth().fillMaxHeight()
                 )
                 is KeyboardRoute.Clipboard -> ClipboardView(
@@ -526,5 +540,6 @@ fun KeyboardView(
             }
         }
         }
+    }
     }
 }
