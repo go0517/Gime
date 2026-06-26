@@ -1,14 +1,11 @@
-<p align="center">
-  <img src="docs/logo.jpg" alt="Xime Logo" width="600">
-</p>
 
-<h1 align="center">Xime（曦码） - 五笔/拼音输入法</h1>
+<h1 align="center">拼音输入法</h1>
 
 [Xime 输入法 (Windows 版)](https://github.com/ximeiorg/winxime) | [Xime 输入法 (Linux 版)](https://github.com/ximeiorg/xime-wayland) | [联想词预测模型](https://github.com/ximeiorg/predictive-text)  | [手写输入法模型](https://github.com/ximeiorg/ochwpro) 
 
 一款基于 <a href="https://rime.im/">Rime</a> 引擎构建的 Android 五笔/拼音输入法，专注于简洁高效的中文输入体验。
 
-目前输入法在慢慢过渡到可以适配其他输入方案。但是，这个输入法还是会保持足够的简洁和易用，不会做成类似 fcitx-android 或者 trime 那样大而全的方案。*它的最终形态会高度定制化并提供小部分自由度的输入法*。因此，如果你觉得 UI 或者功能不符合你的要求，你可以直接 fork 一份自行修改。
+
 
 **这个输入法也是我在 AI 深度学习文本(NLP) 方向的试验田。**
 
@@ -17,27 +14,7 @@
 > 本输入法支持五笔/拼音输入，只是本人以五笔为主，拼音为辅，因此资源会倾向于五笔为主。
 
 
-<table align="center">
-  <tr>
-    <td><img src="docs/Screenshot/keyboard_light.jpg" width="180"></td>
-    <td><img src="docs/Screenshot/keyboard_dark.jpg" width="180"></td>
-    <td><img src="docs/Screenshot/全键盘_下滑_light.jpg" width="180"></td>
-    <td><img src="docs/Screenshot/全键盘_下滑_dark.jpg" width="180"></td>
-  </tr>
-  <tr>
-    <td><img src="docs/Screenshot/数字键盘_dark.jpg" width="180"></td>
-    <td><img src="docs/Screenshot/符号键盘_light.jpg" width="180"></td>
-        <td><img src="docs/Screenshot/emoji_light.jpg" width="180"></td>
-    <td><img src="docs/Screenshot/shotcut_light.jpg" width="180"></td>
-  </tr>
 
-  <tr>
-    <td><img src="docs/Screenshot/theme_light.jpg" width="180"></td>
-    <td><img src="docs/Screenshot/theme_dark.jpg" width="180"></td>
-        <td><img src="docs/Screenshot/plugin_light.jpg" width="180"></td>
-    <td><img src="docs/Screenshot/plugin_dark.jpg" width="180"></td>
-  </tr>
-</table>
 
 ## 功能特点
 
