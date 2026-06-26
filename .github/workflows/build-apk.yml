@@ -1,0 +1,72 @@
+name: 构建 Xime Debug APK
+
+# 触发条件
+on:
+  # 推送到 main 分支时自动构建
+  push:
+    branches: [ main ]
+  # 支持在 Actions 页面手动触发构建
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # 构建超时时间，原生编译耗时较长，设为2小时
+    timeout-minutes: 120
+
+    steps:
+      # 1. 拉取代码 + 递归初始化所有子模块（必须！项目依赖 librime 等子模块）
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # 2. 配置 JDK 17（Gradle 9.x + AGP 要求 JDK 17+）
+      - name: 配置 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. 配置 Android SDK 环境 + 安装 NDK/CMake
+      - name: 配置 Android 构建环境
+        uses: android-actions/setup-android@v2
+        with:
+          cmdline-tools-version: 11076708
+          packages: |
+            platform-tools
+            build-tools;34.0.0
+            platforms;android-34
+            ndk;28.2.13676358
+            cmake;3.22.1
+            ninja
+
+      # 4. 缓存 Gradle 依赖，大幅提升二次构建速度
+      - name: 缓存 Gradle 依赖
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android/build-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # 5. 给 gradlew 添加执行权限
+      - name: 赋予 Gradle 执行权限
+        run: chmod +x ./gradlew
+
+      # 6. 执行构建：编译 Debug 版 APK
+      # 跳过 AAR 元数据检查，和你本地命令保持一致
+      - name: 构建 Debug APK
+        run: ./gradlew :app:assembleDebug -x checkDebugAarMetadata --no-daemon
+
+      # 7. 上传构建产物，构建成功后可在页面下载
+      - name: 上传 APK 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: Xime-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30
