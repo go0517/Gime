@@ -1,4 +1,4 @@
-name: 构建 Xime Debug APK
+name: 构建 Debug APK
 
 # 触发条件
 on:
